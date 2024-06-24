@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { RootLayout } from "../templates/RootLayout";
 import { Link, useLocation } from "react-router-dom";
 
@@ -10,13 +10,13 @@ export const Root = () => {
   return (
     <>
       <RootLayout
-        logo={<FaXTwitter className="md:w-3/5" size="100%" />}
+        logo={<FaXTwitter className="md:w-3/5 text-white" size="100%" />}
         callToActionHeading={
           <>
-            <h2 className="text-4xl md:text-6xl font-bold">
+            <h2 className="text-4xl md:text-6xl font-bold text-white">
               すべての話題が、ここに。
             </h2>
-            <h3 className="text-xl md:text-4xl font-bold">
+            <h3 className="text-xl md:text-4xl font-bold text-white">
               今すぐ参加しましょう。
             </h3>
           </>
@@ -43,13 +43,15 @@ export const Root = () => {
         }
         callToActionContents={
           <>
-            <Link to="/sign_up" state={{ backgroundLocation: location }}>
+            <Link to="/signup" state={{ backgroundLocation: location }}>
               <button className="btn-primary">アカウントを作成</button>
             </Link>
             <small>
               アカウントを登録することにより、利用規約とプライバシーポリシー（Cookieの使用を含む）に同意したとみなされます。
             </small>
-            <p className="font-bold mt-6">アカウントをお持ちの場合</p>
+            <p className="font-bold mt-6 text-white">
+              アカウントをお持ちの場合
+            </p>
             <button className="btn-outline">ログイン</button>
           </>
         }

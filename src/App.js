@@ -1,15 +1,24 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import { Root } from "./components/pages/Root";
+import { SignUp } from "./components/pages/SignUp";
 
 function App() {
+  const location = useLocation();
+  const background = location.state?.background;
   return (
-    <BrowserRouter>
-      <Routes>
+    <>
+      <Routes location={background || location}>
         <Route path="/" element={<Root />}></Route>
+        <Route path="/signup" element={<SignUp />}></Route>
       </Routes>
-    </BrowserRouter>
+      {background && (
+        <Routes>
+          <Route path="/signup" element={<SignUp />}></Route>
+        </Routes>
+      )}
+    </>
   );
 }
 
