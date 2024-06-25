@@ -10,6 +10,7 @@ import { usePostUserReducer } from "../../hooks/signup";
 
 export const SignUp = () => {
   const initialPostState = {
+    status: "INITIAL",
     data: [],
   };
 

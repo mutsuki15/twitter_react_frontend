@@ -3,12 +3,18 @@ import { useReducer } from "react";
 export const usePostUserReducer = (initialState) => {
   const reducer = (state, action) => {
     switch (action.type) {
+      case "POSTING":
+        return {
+          ...state,
+          status: "LOADING",
+          data: [],
+        };
       case "POST_SUCCESS":
         return {
           ...state,
           status: "OK",
           data: {
-            messages: "登録完了、メールを確認してください",
+            messages: "登録完了しました。メールを確認してください",
           },
         };
       case "POST_FAILED":
