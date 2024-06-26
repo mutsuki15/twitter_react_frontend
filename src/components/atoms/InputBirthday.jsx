@@ -38,7 +38,7 @@ export const InputBirthday = () => {
         })}
       </select>
     ),
-    []
+    [dispatch, yearArray]
   );
 
   const selectMonthMemo = useMemo(
@@ -61,7 +61,7 @@ export const InputBirthday = () => {
         })}
       </select>
     ),
-    []
+    [dispatch]
   );
 
   const selectDayMemo = useMemo(
