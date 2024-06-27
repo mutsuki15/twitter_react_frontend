@@ -7,12 +7,16 @@ import { InputTextArea } from "../atoms/InputTextArea";
 import { InputBirthday } from "../atoms/InputBirthday";
 import { postRegistrationCreate, usersActionTypes } from "../../apis/signup";
 import { usePostUserReducer } from "../../hooks/signup";
+import { useRecoilValue } from "recoil";
+import { loginState } from "../../store/loginState";
 
 export const SignUp = () => {
   const initialPostState = {
     status: "INITIAL",
     data: [],
   };
+
+  const login = useRecoilValue(loginState);
 
   const [postState, dispatch] = usePostUserReducer(initialPostState);
 
@@ -36,6 +40,8 @@ export const SignUp = () => {
       {postState.status === "OK" && (
         <Navigate to="/" replace={true} state={postState.data} />
       )}
+
+      {login && <Navigate to="/home" replace={true} />}
 
       <SignUpLayout
         fromHeader={
