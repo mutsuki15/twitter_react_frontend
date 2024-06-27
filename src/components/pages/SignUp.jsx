@@ -5,23 +5,28 @@ import { RxCross2 } from "react-icons/rx";
 import { FaXTwitter } from "react-icons/fa6";
 import { InputTextArea } from "../atoms/InputTextArea";
 import { InputBirthday } from "../atoms/InputBirthday";
-import { postRegistrationCreate, usersActionTypes } from "../../apis/signup";
-import { usePostUserReducer } from "../../hooks/signup";
+import { postRegistrationCreate } from "../../apis/signup";
+import { useRecoilValue } from "recoil";
+import { loginState } from "../../store/loginState";
+import { postingActionTypes } from "../../apis/base";
+import { useUserCreate } from "../../hooks/signup";
 
 export const SignUp = () => {
-  const initialPostState = {
+  const initialState = {
     status: "INITIAL",
     data: [],
   };
 
-  const [postState, dispatch] = usePostUserReducer(initialPostState);
+  const login = useRecoilValue(loginState);
+
+  const { postState, dispatch } = useUserCreate(initialState);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
 
-    dispatch({ type: usersActionTypes.POSTING });
+    dispatch({ type: postingActionTypes.POSTING });
 
     postRegistrationCreate(formData).then((res) => {
       dispatch({
@@ -36,6 +41,8 @@ export const SignUp = () => {
       {postState.status === "OK" && (
         <Navigate to="/" replace={true} state={postState.data} />
       )}
+
+      {login && <Navigate to="/home" replace={true} />}
 
       <SignUpLayout
         fromHeader={
@@ -62,9 +69,9 @@ export const SignUp = () => {
                 type="text"
               />
               <div className="h-10">
-                {postState.data.name && (
+                {postState.errors?.name && (
                   <small className="text-red-500">
-                    ※ユーザー名{postState.data.name}
+                    ※ユーザー名{postState.errors.name}
                   </small>
                 )}
               </div>
@@ -72,9 +79,9 @@ export const SignUp = () => {
             <div>
               <InputTextArea placeholder="メール" name="email" type="text" />
               <div className="h-10">
-                {postState.data.email && (
+                {postState.errors?.email && (
                   <small className="text-red-500">
-                    ※メールアドレス{postState.data.email}
+                    ※メールアドレス{postState.errors.email}
                   </small>
                 )}
               </div>
@@ -82,9 +89,9 @@ export const SignUp = () => {
             <div>
               <InputTextArea placeholder="電話番号" name="phone" type="text" />
               <div className="h-10">
-                {postState.data.phone && (
+                {postState.errors?.phone && (
                   <small className="text-red-500">
-                    ※電話番号{postState.data.phone}
+                    ※電話番号{postState.errors.phone}
                   </small>
                 )}
               </div>
@@ -95,9 +102,9 @@ export const SignUp = () => {
             <div>
               <InputBirthday />
               <div className="h-10">
-                {postState.data.birthday && (
+                {postState.errors?.birthday && (
                   <small className="text-red-500">
-                    ※生年月日{postState.data.birthday}
+                    ※生年月日{postState.errors.birthday}
                   </small>
                 )}
               </div>
@@ -109,9 +116,9 @@ export const SignUp = () => {
                 type="password"
               />
               <div className="h-10">
-                {postState.data.password && (
+                {postState.errors?.password && (
                   <small className="text-red-500">
-                    ※パスワード{postState.data.password}
+                    ※パスワード{postState.errors.password}
                   </small>
                 )}
               </div>
@@ -123,9 +130,9 @@ export const SignUp = () => {
                 type="password"
               />
               <div className="h-10">
-                {postState.data.password_confirmation && (
+                {postState.errors?.password_confirmation && (
                   <small className="text-red-500">
-                    ※確認パスワード{postState.data.password_confirmation}
+                    ※確認パスワード{postState.errors.password_confirmation}
                   </small>
                 )}
               </div>

@@ -1,14 +1,19 @@
 import React from "react";
 import { RootLayout } from "../templates/RootLayout";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 
 import { FaXTwitter } from "react-icons/fa6";
+import { useRecoilValue } from "recoil";
+import { loginState } from "../../store/loginState";
 
 export const Root = () => {
   const location = useLocation();
 
+  const login = useRecoilValue(loginState);
+
   return (
     <>
+      {login && <Navigate to="/home" replace={true} />}
       <RootLayout
         logo={<FaXTwitter className="md:w-3/5 text-white" size="100%" />}
         callToActionHeading={
@@ -52,7 +57,9 @@ export const Root = () => {
             <p className="font-bold mt-6 text-white">
               アカウントをお持ちの場合
             </p>
-            <button className="btn-outline">ログイン</button>
+            <Link to="/sign_in" state={{ backgroundLocation: location }}>
+              <button className="btn-outline">ログイン</button>
+            </Link>
           </>
         }
       />
