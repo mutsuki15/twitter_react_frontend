@@ -19,7 +19,7 @@ export const SignIn = () => {
 
   const location = useLocation();
 
-  const { state, dispatch, callback } = useAuthCreate(initialPostState);
+  const { postState, dispatch, callback } = useAuthCreate(initialPostState);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,7 +43,7 @@ export const SignIn = () => {
     <>
       {login && <Navigate to="/home" replace={true} />}
 
-      {state.status === "OK" && <Navigate to="/home" replace={true} />}
+      {postState.status === "OK" && <Navigate to="/home" replace={true} />}
 
       <SignInLayout
         formHeader={
@@ -63,7 +63,7 @@ export const SignIn = () => {
         formBody={
           <>
             <h3 className="text-3xl font-bold">Xにログイン</h3>
-            <span className="text-red-500">{state?.errors}</span>
+            <span className="text-red-500">{postState?.errors}</span>
             <div>
               <input
                 className="form-input-text"
@@ -84,7 +84,7 @@ export const SignIn = () => {
             <div className="mt-auto">
               <button
                 className="btn-primary"
-                disabled={state.status === "LOADING"}
+                disabled={postState.status === "LOADING"}
               >
                 ログイン
               </button>
