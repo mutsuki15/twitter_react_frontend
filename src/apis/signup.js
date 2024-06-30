@@ -26,6 +26,7 @@ export const postRegistrationCreate = (formData) => {
     .post(users, postData)
     .then(() => ({
       type: usersActionTypes.POST_SUCCESS,
+      messages: "登録完了しました。メールを確認してください。",
     }))
     .catch((e) => ({
       type: usersActionTypes.POST_FAILED,
