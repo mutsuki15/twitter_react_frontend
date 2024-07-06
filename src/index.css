@@ -76,6 +76,14 @@
             focus:outline-2
             focus:outline-sky-400;
   }
+
+  .loading {
+    @apply animate-spin
+           size-7
+           border-4 border-twitter
+           rounded-full
+           border-t-transparent;
+  }
 }
 
 body {

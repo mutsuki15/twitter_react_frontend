@@ -5,7 +5,9 @@ export const HomeLayout = (props) => {
     sideNav,
     header,
     tweetForm,
+    loading,
     bodyContents,
+    pagination,
     sideContentsHeader,
     sideContentsBody,
   } = props;
@@ -45,13 +47,17 @@ export const HomeLayout = (props) => {
             lg:col-start-2
           `}
           >
-            <div className="hidden md:block md:px-5 md:py-2 md:border-b md:border-gray-500">
+            <div className="hidden md:block md:px-4 md:py-4 md:border-b md:border-gray-500">
               <div className="flex">
                 <div className="w-1/12"></div>
                 <div className="w-11/12">{tweetForm}</div>
               </div>
             </div>
-            {bodyContents}
+            <div>{loading}</div>
+            <div>
+              {bodyContents}
+              <div className="py-2">{pagination}</div>
+            </div>
           </div>
           <div
             className={`

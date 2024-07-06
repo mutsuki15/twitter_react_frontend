@@ -10,6 +10,7 @@ import { useSetRecoilState } from "recoil";
 import { loginState } from "./store/loginState";
 import { getValidateToken } from "./apis/signin";
 import { Post } from "./components/pages/Post";
+import { Photo } from "./components/pages/Photo";
 
 function App() {
   const location = useLocation();
@@ -34,6 +35,7 @@ function App() {
         <Route path="/sign_in" element={<SignIn />}></Route>
         <Route path="/home" element={<Home />}></Route>
         <Route path="/post" element={<Post />} />
+        <Route path="/photo/:id" element={<Photo />} />
       </Routes>
       {background && (
         <Routes>

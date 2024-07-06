@@ -8,11 +8,12 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { postTweetCreate } from "../../apis/tweets";
 import { patchImagesUpdate } from "../../apis/images";
 import { useSelectImages } from "../../hooks/selectImages";
-import { TweetImages } from "./TweetImages";
 import { useTweetCreate } from "../../hooks/tweets";
 import { postingActionTypes } from "../../apis/base";
+import { TweetImagePreview } from "./TweetImagePreview";
 
-export const TweetForm = () => {
+export const TweetForm = (props) => {
+  const { successAction } = props;
   const initialPostState = {
     status: "INITIAL",
     data: [],
@@ -72,6 +73,7 @@ export const TweetForm = () => {
         payload: res,
         callback: {
           success: () => {
+            successAction();
             setTweetContentFlag(true);
             callback.success(e);
           },
@@ -103,7 +105,7 @@ export const TweetForm = () => {
           />
         </div>
         {imageFilesState.length ? (
-          <TweetImages
+          <TweetImagePreview
             imageFiles={imageFilesState}
             length={imageFilesState.length}
             handleDelete={handleImagePreviewDelete}
