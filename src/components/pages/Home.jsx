@@ -8,7 +8,7 @@ import { useTweetsIndex } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
 import { fetchTweetsIndex } from "../../apis/tweets";
 import { Pagination } from "../organisms/Pagination";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 export const Home = () => {
   const initialFetchState = {
@@ -23,7 +23,6 @@ export const Home = () => {
   const { fetchTweetsState, fetchTweetsDispatch, callback } =
     useTweetsIndex(initialFetchState);
 
-  // handleFetchTweets を useCallback でメモ化
   const handleFetchTweets = useCallback(async () => {
     console.log("Fetching tweets...");
     await fetchTweetsDispatch({ type: fetchingActionTypes.FETCHING });
@@ -107,7 +106,7 @@ export const Home = () => {
         <>
           {fetchTweetsState.data?.tweets &&
             fetchTweetsState.data?.tweets.map((tweet) => (
-              <div className="border-b border-gray-500" key={tweet.id}>
+              <div className="border-b border-gray-500 relative" key={tweet.id}>
                 <TweetCard tweet={tweet} />
               </div>
             ))}
