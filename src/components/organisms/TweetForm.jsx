@@ -8,9 +8,9 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { postTweetCreate } from "../../apis/tweets";
 import { patchImagesUpdate } from "../../apis/images";
 import { useSelectImages } from "../../hooks/selectImages";
-import { TweetImages } from "./TweetImages";
 import { useTweetCreate } from "../../hooks/tweets";
 import { postingActionTypes } from "../../apis/base";
+import { TweetImagePreview } from "./TweetImagePreview";
 
 export const TweetForm = () => {
   const initialPostState = {
@@ -103,7 +103,7 @@ export const TweetForm = () => {
           />
         </div>
         {imageFilesState.length ? (
-          <TweetImages
+          <TweetImagePreview
             imageFiles={imageFilesState}
             length={imageFilesState.length}
             handleDelete={handleImagePreviewDelete}

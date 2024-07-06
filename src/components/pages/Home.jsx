@@ -3,6 +3,7 @@ import { HomeLayout } from "../templates/HomeLayout";
 import { SideNav } from "../organisms/SideNav";
 import { IoIosSearch } from "react-icons/io";
 import { TweetForm } from "../organisms/TweetForm";
+import { TweetCard } from "../organisms/TweetCard";
 
 export const Home = () => {
   return (
