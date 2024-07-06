@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import { HomeLayout } from "../templates/HomeLayout";
 import { SideNav } from "../organisms/SideNav";
 import { IoIosSearch } from "react-icons/io";
@@ -23,7 +23,9 @@ export const Home = () => {
   const { fetchTweetsState, fetchTweetsDispatch, callback } =
     useTweetsIndex(initialFetchState);
 
-  const handleFetchTweets = async () => {
+  // handleFetchTweets を useCallback でメモ化
+  const handleFetchTweets = useCallback(async () => {
+    console.log("Fetching tweets...");
     await fetchTweetsDispatch({ type: fetchingActionTypes.FETCHING });
 
     await fetchTweetsIndex(currentPage).then((res) => {
@@ -35,13 +37,20 @@ export const Home = () => {
         },
       });
     });
-  };
+  }, [currentPage, fetchTweetsDispatch, callback.authFiled]);
 
   useEffect(() => {
+    console.log("useEffect triggered", {
+      searchParams,
+      searchParamsPage: searchParams.get("page"),
+      handleFetchTweets,
+    });
+
     window.scroll({
       top: 0,
       behavior: "smooth",
     });
+
     handleFetchTweets();
   }, [searchParams]);
 
