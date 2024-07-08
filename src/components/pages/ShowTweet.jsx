@@ -106,49 +106,6 @@ export const ShowTweet = () => {
                 w-10/12
                 bg-zinc-900
                 rounded-xl
-              `}
-            >
-              <div className="p-3">
-                <h4 className="font-bold text-lg mb-1">
-                  プレミアムにサブスクライブ
-                </h4>
-                <span>
-                  サブスクライブして新機能を利用しましょう。資格を満たしている場合、広告収益配分を受け取れます。
-                </span>
-                <button className="btn-primary w-4/12 mt-2 h-10">
-                  購入する
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="w-full flex justify-center mt-2">
-            <div
-              className={`
-                w-10/12
-                bg-zinc-900
-                rounded-xl
-                mt-3
-              `}
-            >
-              <div className="p-3">
-                <h4 className="font-bold text-xl mb-1">いまどうしてる？</h4>
-                <ul>
-                  <li className="py-4 font-bold">PHP</li>
-                  <li className="py-4 font-bold">Ruby</li>
-                  <li className="py-4 font-bold">React</li>
-                  <li className="py-4 font-bold">Rails</li>
-                  <li className="py-4 font-bold">Go</li>
-                </ul>
-                <small className="text-orange-500">さらに表示</small>
-              </div>
-            </div>
-          </div>
-          <div className="w-full flex justify-center mt-2">
-            <div
-              className={`
-                w-10/12
-                bg-zinc-900
-                rounded-xl
                 mt-3
               `}
             >
@@ -161,7 +118,7 @@ export const ShowTweet = () => {
                   <li className="py-4 font-bold">TestUser4</li>
                   <li className="py-4 font-bold">TestUser5</li>
                 </ul>
-                <small className="text-orange-500">さらに表示</small>
+                <small className="text-twitter">さらに表示</small>
               </div>
             </div>
           </div>
