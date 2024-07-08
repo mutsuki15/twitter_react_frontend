@@ -1,8 +1,10 @@
-import { useReducer } from "react";
-import { postReducer } from "../reducers/requestActionReducer";
+import { useEffect, useCallback, useReducer } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useSetRecoilState } from "recoil";
+import { postReducer } from "../reducers/requestActionReducer";
 import { loginState } from "../store/loginState";
+import { getValidateToken } from "../apis/signin";
 
 export const useAuthCreate = (initialState) => {
   const [postState, dispatch] = useReducer(postReducer, initialState);
@@ -30,4 +32,41 @@ export const useAuthFailedCall = () => {
   };
 
   return failedCall;
+};
+
+const publicPaths = ["/", "/signin", "/signup"];
+
+export const useAuthCheck = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const setLogin = useSetRecoilState(loginState);
+
+  const handleRequireLogin = useCallback(async () => {
+    if (publicPaths.includes(location.pathname)) {
+      return;
+    }
+
+    const accessToken = Cookies.get("access-token");
+    const client = Cookies.get("client");
+    const uid = Cookies.get("uid");
+
+    if (!accessToken || !client || !uid) {
+      navigate("/");
+      return;
+    }
+
+    const res = await getValidateToken();
+    if (res.status) {
+      setLogin(true);
+      if (location.pathname === "/signup" || location.pathname === "/signin") {
+        navigate("/home");
+      }
+    } else {
+      navigate("/signin");
+    }
+  }, [navigate, setLogin, location.pathname]);
+
+  useEffect(() => {
+    handleRequireLogin();
+  }, []);
 };

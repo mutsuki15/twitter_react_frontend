@@ -57,7 +57,7 @@ export const Root = () => {
             <p className="font-bold mt-6 text-white">
               アカウントをお持ちの場合
             </p>
-            <Link to="/sign_in" state={{ backgroundLocation: location }}>
+            <Link to="/signin" state={{ backgroundLocation: location }}>
               <button className="btn-outline">ログイン</button>
             </Link>
           </>
