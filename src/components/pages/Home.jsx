@@ -8,7 +8,8 @@ import { useTweetsIndex } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
 import { fetchTweetsIndex } from "../../apis/tweets";
 import { Pagination } from "../organisms/Pagination";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { signOut } from "../../apis/signout";
 
 export const Home = () => {
   const initialFetchState = {
@@ -17,14 +18,13 @@ export const Home = () => {
   };
 
   const [searchParams] = useSearchParams();
-
+  const navigate = useNavigate();
   const currentPage = searchParams.get("page") || 0;
 
   const { fetchTweetsState, fetchTweetsDispatch, callback } =
     useTweetsIndex(initialFetchState);
 
   const handleFetchTweets = useCallback(async () => {
-    console.log("Fetching tweets...");
     await fetchTweetsDispatch({ type: fetchingActionTypes.FETCHING });
 
     await fetchTweetsIndex(currentPage).then((res) => {
@@ -39,19 +39,20 @@ export const Home = () => {
   }, [currentPage, fetchTweetsDispatch, callback.authFiled]);
 
   useEffect(() => {
-    console.log("useEffect triggered", {
-      searchParams,
-      searchParamsPage: searchParams.get("page"),
-      handleFetchTweets,
-    });
-
     window.scroll({
       top: 0,
       behavior: "smooth",
     });
 
     handleFetchTweets();
-  }, [searchParams]);
+  }, [currentPage]);
+
+  const handleSignOut = async () => {
+    const response = await signOut();
+    if (response.status === 200) {
+      navigate("/");
+    }
+  };
 
   const sideNavMemo = useMemo(() => <SideNav />, []);
 
@@ -89,6 +90,9 @@ export const Home = () => {
             <span className="w-1/2 flex justify-center items-center">
               フォロー中
             </span>
+            <button onClick={handleSignOut} className="btn-logout">
+              ログアウト
+            </button>
           </nav>
         </>
       }
