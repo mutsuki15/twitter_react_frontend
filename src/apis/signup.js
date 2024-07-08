@@ -1,5 +1,9 @@
 import { users } from "../urls/index";
-import { baseAxios } from "./base";
+import {
+  baseAxios,
+  baseAxiosWithAuthHeaders,
+  fetchingActionTypes,
+} from "./base";
 
 export const usersActionTypes = {
   POSTING: "POSTING",
@@ -31,5 +35,22 @@ export const postRegistrationCreate = (formData) => {
     .catch((e) => ({
       type: usersActionTypes.POST_FAILED,
       errors: e.response.data.errors,
+    }));
+};
+
+export const fetchUsersShow = (name) => {
+  return baseAxiosWithAuthHeaders
+    .get(users + `/${name}`, {
+      params: { name: name },
+    })
+    .then((res) => ({
+      type: fetchingActionTypes.FETCH_SUCCESS,
+      data: res.data,
+    }))
+    .catch((e) => ({
+      type: e.isLogin
+        ? fetchingActionTypes.FETCH_FAILED
+        : fetchingActionTypes.AUTH_FAILED,
+      errors: e,
     }));
 };

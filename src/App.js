@@ -8,6 +8,7 @@ import { Post } from "./components/pages/Post";
 import { Photo } from "./components/pages/Photo";
 import { ShowTweet } from "./components/pages/ShowTweet";
 import { useAuthCheck } from "./hooks/auth";
+import { Profile } from "./components/pages/Profile";
 
 function App() {
   const location = useLocation();
@@ -25,6 +26,7 @@ function App() {
         <Route path="/post" element={<Post />} />
         <Route path="/photo/:id" element={<Photo />} />
         <Route path="/tweets/:id" element={<ShowTweet />} />
+        <Route path="/:name" element={<Profile />} />
       </Routes>
       {background && (
         <Routes>
