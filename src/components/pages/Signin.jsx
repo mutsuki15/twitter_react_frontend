@@ -97,7 +97,7 @@ export const SignIn = () => {
               アカウントをお持ちでない場合は
               <span className="text-blue-500 ml-1 hover:underline">
                 <Link
-                  to="/sign_up"
+                  to="/signup"
                   state={{
                     backgroundLocation:
                       location.state && location.state.backgroundLocation,

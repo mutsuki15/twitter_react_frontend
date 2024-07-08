@@ -1,6 +1,11 @@
+// src/apis/signin.js
 import Cookies from "js-cookie";
 import { signIn, users, validateToken } from "../urls";
-import { baseAxios, postingActionTypes } from "./base";
+import {
+  baseAxios,
+  baseAxiosWithAuthHeaders,
+  postingActionTypes,
+} from "./base";
 
 export const postSessionCreate = (formData) => {
   const postData = {
@@ -10,14 +15,22 @@ export const postSessionCreate = (formData) => {
 
   return baseAxios
     .post(users + signIn, postData)
-    .then((res) => ({
-      type: postingActionTypes.POST_SUCCESS,
-      headers: {
-        accessToken: res.headers["access-token"],
-        client: res.headers["client"],
-        uid: res.headers["uid"],
-      },
-    }))
+    .then((res) => {
+      const { "access-token": accessToken, client, uid } = res.headers;
+
+      Cookies.set("access-token", accessToken);
+      Cookies.set("client", client);
+      Cookies.set("uid", uid);
+
+      return {
+        type: postingActionTypes.POST_SUCCESS,
+        headers: {
+          accessToken,
+          client,
+          uid,
+        },
+      };
+    })
     .catch((e) => ({
       type: postingActionTypes.POST_FAILED,
       errors: e.response.data.errors,
@@ -25,14 +38,12 @@ export const postSessionCreate = (formData) => {
 };
 
 export const getValidateToken = () => {
-  return baseAxios
-    .get(users + validateToken, {
-      headers: {
-        "access-token": Cookies.get("access-token"),
-        client: Cookies.get("client"),
-        uid: Cookies.get("uid"),
-      },
-    })
+  const accessToken = Cookies.get("access-token");
+  const client = Cookies.get("client");
+  const uid = Cookies.get("uid");
+
+  return baseAxiosWithAuthHeaders
+    .get(users + validateToken)
     .then(() => ({
       status: true,
     }))

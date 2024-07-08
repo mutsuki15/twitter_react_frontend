@@ -21,12 +21,26 @@ export const baseAxios = axios.create({
 
 export const baseAxiosWithAuthHeaders = axios.create({
   baseURL: DEFAULT_API_LOCALHOST,
-  headers: {
-    "access-token": Cookies.get("access-token"),
-    client: Cookies.get("client"),
-    uid: Cookies.get("uid"),
-  },
 });
+
+baseAxiosWithAuthHeaders.interceptors.request.use(
+  (config) => {
+    const accessToken = Cookies.get("access-token");
+    const client = Cookies.get("client");
+    const uid = Cookies.get("uid");
+
+    if (accessToken && client && uid) {
+      config.headers["access-token"] = accessToken;
+      config.headers.client = client;
+      config.headers.uid = uid;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 baseAxiosWithAuthHeaders.interceptors.response.use(
   (res) => {
