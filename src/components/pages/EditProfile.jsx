@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineAddAPhoto } from "react-icons/md";
-import { patchUsersUpdate } from "../../apis/signup";
+import { patchUsersUpdate } from "../../apis/users";
 import { useUsersUpdate } from "../../hooks/signup";
 import { patchActionTypes } from "../../apis/base";
 import { EditProfileLayout } from "../templates/EditProfileLayout";

@@ -12,7 +12,7 @@ import { IoIosMore, IoIosSearch } from "react-icons/io";
 import { LuMail } from "react-icons/lu";
 import { LuBellPlus } from "react-icons/lu";
 import { useUsersShow } from "../../hooks/signup";
-import { fetchUsersShow } from "../../apis/signup";
+import { fetchUsersShow } from "../../apis/users";
 import { fetchingActionTypes } from "../../apis/base";
 import { TweetCard } from "../organisms/TweetCard";
 import { CiLocationOn } from "react-icons/ci";
