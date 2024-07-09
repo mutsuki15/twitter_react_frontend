@@ -146,25 +146,6 @@ export const Home = () => {
       }
       sideContentsBody={
         <div className="sticky top-0 -z-10">
-          <div className="w-full flex justify-center">
-            <div
-              className={`
-                w-10/12
-                bg-zinc-900
-                rounded-xl
-              `}
-            ></div>
-          </div>
-          <div className="w-full flex justify-center">
-            <div
-              className={`
-                w-10/12
-                bg-zinc-900
-                rounded-xl
-                mt-3
-              `}
-            ></div>
-          </div>
           <div className="w-full flex justify-center mt-2">
             <div
               className={`

@@ -5,7 +5,7 @@ import { RxCross2 } from "react-icons/rx";
 import { FaXTwitter } from "react-icons/fa6";
 import { InputTextArea } from "../atoms/InputTextArea";
 import { InputBirthday } from "../atoms/InputBirthday";
-import { postRegistrationCreate } from "../../apis/signup";
+import { postRegistrationCreate } from "../../apis/users";
 import { useRecoilValue } from "recoil";
 import { loginState } from "../../store/loginState";
 import { postingActionTypes } from "../../apis/base";
