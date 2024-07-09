@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { HomeLayout } from "../templates/HomeLayout";
 import { SideNav } from "../organisms/SideNav";
 import { IoIosSearch } from "react-icons/io";
@@ -6,7 +6,7 @@ import { TweetForm } from "../organisms/TweetForm";
 import { TweetCard } from "../organisms/TweetCard";
 import { useTweetsIndex } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
-import { fetchTweetsIndex } from "../../apis/tweets";
+import { deleteTweetsDestroy, fetchTweetsIndex } from "../../apis/tweets";
 import { Pagination } from "../organisms/Pagination";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { signOut } from "../../apis/signout";
@@ -24,6 +24,8 @@ export const Home = () => {
   const { fetchTweetsState, fetchTweetsDispatch, callback } =
     useTweetsIndex(initialFetchState);
 
+  const [tweets, setTweets] = useState([]);
+
   const handleFetchTweets = useCallback(async () => {
     await fetchTweetsDispatch({ type: fetchingActionTypes.FETCHING });
 
@@ -32,11 +34,20 @@ export const Home = () => {
         type: res.type,
         payload: res,
         callback: {
+          success: () => {
+            setTweets(res.data.tweets);
+          },
           authFiled: callback.authFiled,
         },
       });
     });
   }, [currentPage, fetchTweetsDispatch, callback.authFiled]);
+
+  const handleTweetDelete = (id) => {
+    deleteTweetsDestroy(id).then((deleteId) => {
+      setTweets([...tweets].filter((tweet) => tweet.id !== Number(deleteId)));
+    });
+  };
 
   useEffect(() => {
     window.scroll({
@@ -107,14 +118,16 @@ export const Home = () => {
         </>
       }
       bodyContents={
-        <>
-          {fetchTweetsState.data?.tweets &&
-            fetchTweetsState.data?.tweets.map((tweet) => (
-              <div className="border-b border-gray-500 relative" key={tweet.id}>
-                <TweetCard tweet={tweet} type="index" />
-              </div>
-            ))}
-        </>
+        fetchTweetsState.status === "OK" &&
+        tweets.map((tweet) => (
+          <div className="border-b border-gray-500 relative" key={tweet.id}>
+            <TweetCard
+              tweet={tweet}
+              type="index"
+              handleTweetDelete={() => handleTweetDelete(tweet.id)}
+            />
+          </div>
+        ))
       }
       pagination={
         <>

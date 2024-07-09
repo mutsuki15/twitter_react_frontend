@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ShowTweetLayout } from "../templates/ShowTweetLayout";
 import { useNavigate, useParams } from "react-router-dom";
 import { SideNav } from "../organisms/SideNav";
@@ -6,7 +6,7 @@ import { IoIosSearch } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useTweetsShow } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
-import { fetchTweetsShow } from "../../apis/tweets";
+import { deleteTweetsDestroy, fetchTweetsShow } from "../../apis/tweets";
 import { TweetCard } from "../organisms/TweetCard";
 
 export const ShowTweet = () => {
@@ -43,6 +43,12 @@ export const ShowTweet = () => {
     navigate(-1);
   };
 
+  const handleTweetDelete = (id) => {
+    deleteTweetsDestroy(id).then(() => {
+      navigate(-1);
+    });
+  };
+
   return (
     <ShowTweetLayout
       sideNav={<SideNav />}
@@ -76,7 +82,13 @@ export const ShowTweet = () => {
       bodyContents={
         fetchTweetState.status === "OK" && (
           <div className="h-screen">
-            <TweetCard tweet={fetchTweetState.data.tweet} type="show" />
+            <TweetCard
+              tweet={fetchTweetState.data.tweet}
+              type="show"
+              handleTweetDelete={() =>
+                handleTweetDelete(fetchTweetState.data.tweet.id)
+              }
+            />
           </div>
         )
       }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoIosMore } from "react-icons/io";
 import { BiMessageRounded } from "react-icons/bi";
 import { FaRetweet } from "react-icons/fa";
@@ -8,9 +8,20 @@ import { BiBarChart } from "react-icons/bi";
 import { MdOutlineFileUpload } from "react-icons/md";
 import { TweetImages } from "./TweetImages";
 import { Link } from "react-router-dom";
+import { FaTrashCan } from "react-icons/fa6";
 
 export const TweetCard = (props) => {
-  const { tweet, type } = props;
+  const { tweet, type, handleTweetDelete } = props;
+
+  const [menuOepn, setMenuOpen] = useState(false);
+
+  const handleTweetMenuOpen = () => {
+    setMenuOpen(true);
+  };
+
+  const handleTweetMenuClose = () => {
+    setMenuOpen(false);
+  };
 
   return (
     <>
@@ -51,7 +62,7 @@ export const TweetCard = (props) => {
           <div className="flex justify-between">
             <div className="px-2 z-20">
               <Link to={`/${tweet.user.name}`} className="font-semibold mr-2">
-                {tweet.user.nickname}
+                {tweet.user.name}
               </Link>
               {type === "index" ? (
                 <>
@@ -76,16 +87,56 @@ export const TweetCard = (props) => {
                 </div>
               )}
             </div>
-            <button
-              className={`
-            size-8 z-20
-            flex justify-center items-center
-            rounded-full
-            hover:bg-white hover:bg-opacity-5 hover:cursor-pointer
-          `}
-            >
-              <IoIosMore className="size-5 text-gray-400" />
-            </button>
+            {menuOepn ? (
+              <>
+                <div className="size-8"></div>
+                <div
+                  className="w-full h-full fixed top-0 left-0 hover:cursor-default z-30"
+                  onClick={handleTweetMenuClose}
+                ></div>
+                <div className={`${type === "show" && "relative"}`}>
+                  <div
+                    className={`
+                    w-[300px] z-40
+                    bg-black
+                    absolute top-3 right-3
+                    drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]
+                    rounded-2xl
+                  `}
+                  >
+                    <div
+                      className={`
+                      flex flex-col justify-center
+                      items-start font-bold
+                      py-5 px-3 gap-y-5
+                    `}
+                    >
+                      <button
+                        className="text-red-500 w-full flex items-center gap-x-1"
+                        onClick={handleTweetDelete}
+                      >
+                        <FaTrashCan />
+                        削除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <button
+                className={`
+                size-8 z-20
+                flex justify-center items-center
+                rounded-full
+                hover:bg-white hover:bg-opacity-5 hover:cursor-pointer
+              `}
+                onClick={() => {
+                  handleTweetMenuOpen();
+                }}
+              >
+                <IoIosMore className="size-5 text-gray-400" />
+              </button>
+            )}
           </div>
           {type === "index" && (
             <>
