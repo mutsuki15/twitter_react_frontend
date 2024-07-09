@@ -15,6 +15,8 @@ import { useUsersShow } from "../../hooks/signup";
 import { fetchUsersShow } from "../../apis/signup";
 import { fetchingActionTypes } from "../../apis/base";
 import { TweetCard } from "../organisms/TweetCard";
+import { CiLocationOn } from "react-icons/ci";
+import { PiLinkSimpleBold } from "react-icons/pi";
 
 export const Profile = () => {
   const initialFetchState = {
@@ -23,6 +25,8 @@ export const Profile = () => {
   };
 
   const { name } = useParams();
+
+  const location = useLocation();
 
   const [searchParams] = useSearchParams();
   const isTab = searchParams.get("tab") || "tweets";
@@ -42,9 +46,7 @@ export const Profile = () => {
         },
       });
     });
-  }, []);
-
-  console.log(fetchUserState.data.tweets?.length);
+  }, [location]);
 
   return (
     <ProfileLayout
@@ -84,47 +86,93 @@ export const Profile = () => {
       }
       profile={
         <>
-          {fetchUserState.status !== "LOADING" && "INITIAL" && (
+          {fetchUserState.status === "OK" && (
             <div className="border-b border-gray-400">
               <div className="w-full h-[200px] relative">
                 <img
                   className="w-full h-full object-cover"
-                  src="https://placehold.jp/1500x500.png"
+                  src={
+                    fetchUserState.data.user.header ||
+                    "https://placehold.jp/1500x500.png"
+                  }
                   alt="header"
                 />
                 <div className="size-[135px] absolute -bottom-1/4 left-4">
                   <img
                     className="w-full h-full object-cover rounded-full border-4 border-black"
-                    src="https://placehold.jp/400x400.png"
+                    src={
+                      fetchUserState.data.user.icon ||
+                      "https://placehold.jp/400x400.png"
+                    }
                     alt="header"
                   />
                 </div>
               </div>
               <div className="w-full h-16 flex justify-end px-3 py-2">
                 {fetchUserState.data.is_current_user ? (
-                  <Link className="h-[34px] text-sm border rounded-full flex justify-center items-center px-5">
+                  <Link
+                    to="/settings/profile"
+                    className={`
+                    h-[34px] text-sm px-5
+                    flex justify-center items-center
+                    transition border rounded-full
+                    hover:bg-opacity-10 hover:bg-white
+                    `}
+                    state={{
+                      backgroundLocation: location,
+                      user: fetchUserState.data.user,
+                    }}
+                  >
                     プロフィールを編集
                   </Link>
                 ) : (
                   <>
-                    <span className="size-[34px] flex justify-center items-center border rounded-full">
+                    <button
+                      className={`
+                      size-[34px]
+                      flex justify-center items-center
+                      border rounded-full mr-3 transition
+                      hover:bg-opacity-10 hover:bg-white
+                    `}
+                    >
                       <IoIosMore />
-                    </span>
-                    <span className="size-[34px] flex justify-center items-center border rounded-full">
+                    </button>
+                    <button
+                      className={`
+                      size-[34px]
+                      flex justify-center items-center
+                      border rounded-full mr-3 transition
+                      hover:bg-opacity-10 hover:bg-white
+                    `}
+                    >
                       <LuMail />
-                    </span>
-                    <span className="size-[34px] flex justify-center items-center border rounded-full">
+                    </button>
+                    <button
+                      className={`
+                      size-[34px]
+                      flex justify-center items-center
+                      border rounded-full mr-3 transition
+                      hover:bg-opacity-10 hover:bg-white
+                    `}
+                    >
                       <LuBellPlus />
-                    </span>
-                    <span className="h-[34px] border rounded-full flex justify-center items-center px-5">
+                    </button>
+                    <button
+                      className={`
+                      h-[34px] px-4
+                      flex justify-center items-center
+                      border rounded-full mr-3 transition
+                      hover:bg-opacity-10 hover:bg-white
+                    `}
+                    >
                       フォロー中
-                    </span>
+                    </button>
                   </>
                 )}
               </div>
               <div className="px-3 pb-4 flex flex-col">
                 <span className="font-bold text-xl">
-                  {fetchUserState.data.user?.nickname}
+                  {fetchUserState.data.user?.name}
                 </span>
                 <span className="text-gray-400">
                   @{fetchUserState.data.user?.name}
@@ -134,7 +182,29 @@ export const Profile = () => {
                 <span>{fetchUserState.data.user?.bio}</span>
               </div>
               <div className="px-3 py-2">
-                <span>{fetchUserState.data.user?.location}</span>
+                <span className="text-gray-400 flex items-center">
+                  {fetchUserState.data.user?.location && (
+                    <>
+                      <CiLocationOn />
+                      <span className="mr-2">
+                        {fetchUserState.data.user.location}
+                      </span>
+                    </>
+                  )}
+                  {fetchUserState.data.user?.website && (
+                    <>
+                      <PiLinkSimpleBold />
+                      {
+                        <a
+                          className="text-twitter hover:underline"
+                          href={fetchUserState.data.user?.website}
+                        >
+                          {fetchUserState.data.user?.website}
+                        </a>
+                      }
+                    </>
+                  )}
+                </span>
               </div>
               <div className="px-3 flex">
                 <div className="mr-3">
@@ -146,7 +216,7 @@ export const Profile = () => {
                   <span className="text-gray-400">フォロワー</span>
                 </div>
               </div>
-              <div className="flex h-[50px] my-2">
+              <div className="flex h-[50px] my-1 mt-2">
                 <div
                   className={`
                     w-1/4 h-full
@@ -169,28 +239,28 @@ export const Profile = () => {
                 </div>
                 <div
                   className={`
-                    w-1/4 h-full
-                    flex justify-center items-center
-                    hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
-                  `}
+                  w-1/4 h-full
+                  flex justify-center items-center
+                  hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
+                `}
                 >
                   <span>返信</span>
                 </div>
                 <div
                   className={`
-                    w-1/4 h-full
-                    flex justify-center items-center
-                    hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
-                  `}
+                  w-1/4 h-full
+                  flex justify-center items-center
+                  hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
+                `}
                 >
                   <span>メディア</span>
                 </div>
                 <div
                   className={`
-                    w-1/4 h-full
-                    flex justify-center items-center
-                    hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
-                  `}
+                  w-1/4 h-full
+                  flex justify-center items-center
+                  hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
+                `}
                 >
                   <span>いいね</span>
                 </div>
