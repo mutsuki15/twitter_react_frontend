@@ -18,8 +18,11 @@ import { TweetCard } from "../organisms/TweetCard";
 import { CiLocationOn } from "react-icons/ci";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { deleteTweetsDestroy } from "../../apis/tweets";
+import { useRecoilValue } from "recoil";
+import { currentUserState } from "../../store/currentUserState";
 
 export const Profile = () => {
+  const currentUser = useRecoilValue(currentUserState);
   const initialFetchState = {
     status: "INITIAL",
     data: [],
@@ -59,6 +62,10 @@ export const Profile = () => {
       });
     });
   }, [location]);
+
+  if (!currentUser) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <ProfileLayout

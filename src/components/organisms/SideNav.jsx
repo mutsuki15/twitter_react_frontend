@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaXTwitter } from "react-icons/fa6";
 import { TextWithIcon } from "../molecules/TextWithIcon";
 import { GoHomeFill } from "react-icons/go";
@@ -11,10 +11,25 @@ import { IoPeopleOutline } from "react-icons/io5";
 import { IoPersonOutline } from "react-icons/io5";
 import { CgMoreO } from "react-icons/cg";
 import { RiQuillPenLine } from "react-icons/ri";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { currentUserState } from "../../store/currentUserState";
+import { IoIosMore } from "react-icons/io";
+import { signOut } from "../../apis/signout";
 
 export const SideNav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const currentUser = useRecoilValue(currentUserState);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleLogout = async () => {
+    const response = await signOut();
+    if (response.status === 200) {
+      navigate("/");
+    }
+  };
+
   return (
     <>
       <div
@@ -148,20 +163,24 @@ export const SideNav = () => {
             text="プレミアム"
           />
         </div>
-        <div
-          className={`
-          hidden
-          md:w-[50px] md:h-[50px]
-          md:flex md:items-center md:justify-center
-          xl:w-[260px] xl:h-[58px]
-          xl:justify-start
-        `}
-        >
-          <TextWithIcon
-            icon={<IoPersonOutline className="size-7" />}
-            text="プロフィール"
-          />
-        </div>
+        {currentUser && (
+          <div
+            className={`
+            hidden
+            md:w-[50px] md:h-[50px]
+            md:flex md:items-center md:justify-center
+            xl:w-[260px] xl:h-[58px]
+            xl:justify-start
+          `}
+          >
+            <Link to={`/${currentUser.name}`}>
+              <TextWithIcon
+                icon={<IoPersonOutline className="size-7" />}
+                text="プロフィール"
+              />
+            </Link>
+          </div>
+        )}
         <div
           className={`
           hidden
@@ -214,30 +233,86 @@ export const SideNav = () => {
             </Link>
           </button>
         </div>
-        <div
-          className={`
-          w-[58px] h-[58px]
-          mb-4
-          flex justify-center items-center
-          xl:w-[230px]
-          xl:h-[68px]
-        `}
-        >
+        {currentUser && (
           <div
             className={`
-            w-full h-full
+            w-[58px] h-[58px]
+            mb-4
             flex justify-center items-center
-            hover:bg-gray-800 hover:bg-opacity-70 hover:rounded-full
-            xl:px-3
+            xl:w-[230px]
+            xl:h-[68px]
           `}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <div className="xl:mr-3">icon</div>
-            <div className="hidden xl:block">
-              <div>name</div>
-              <div>id</div>
+            <div
+              className={`
+              w-full h-full
+              cursor-pointer
+              flex justify-center items-center
+              hover:bg-gray-800 hover:bg-opacity-70 hover:rounded-full
+              xl:px-3
+            `}
+            >
+              <div className="xl:mr-3 w-3/12 relative">
+                <div className="size-[40px]">
+                  {currentUser.icon ? (
+                    <img
+                      className="object-cover rounded-full"
+                      src={currentUser.icon}
+                      alt="currentUserIcon"
+                    />
+                  ) : (
+                    <img
+                      className="object-cover rounded-full"
+                      src="https://placehold.jp/400x400.png"
+                      alt="currentUserDefaultIcon"
+                    />
+                  )}
+                </div>
+              </div>
+              <div className=" w-full flex justify-between items-center">
+                <div className="hidden xl:block">
+                  <div>
+                    <span className="font-semibold">{currentUser.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">@{currentUser.name}</span>
+                  </div>
+                </div>
+                <div className="hidden md:none">
+                  <IoIosMore size={20} />
+                </div>
+              </div>
             </div>
+            {isDropdownOpen && (
+              <div
+                className={`
+                w-[300px] z-40
+                bg-black
+                absolute bottom-12 right-0
+                drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]
+                rounded-2xl
+                md:translate-x-0 translate-x-[-75%] md:right-0 right-[-10px]
+              `}
+              >
+                <div
+                  className={`
+                  flex flex-col justify-center
+                  items-start font-bold
+                  py-5 px-3 gap-y-5
+                `}
+                >
+                  <button
+                    className="text-white w-full flex items-center gap-x-1"
+                    onClick={handleLogout}
+                  >
+                    ログアウト
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </>
   );

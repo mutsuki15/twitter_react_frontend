@@ -1,4 +1,3 @@
-// src/apis/signin.js
 import Cookies from "js-cookie";
 import { signIn, users, validateToken } from "../urls";
 import {
