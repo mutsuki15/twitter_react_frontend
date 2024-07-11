@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 import { useSetRecoilState } from "recoil";
 import { postReducer } from "../reducers/requestActionReducer";
 import { loginState } from "../store/loginState";
-import { getValidateToken } from "../apis/signin";
+import { getValidateToken } from "../apis/auth";
 
 export const useAuthCreate = (initialState) => {
   const [postState, dispatch] = useReducer(postReducer, initialState);

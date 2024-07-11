@@ -8,10 +8,16 @@ import { useTweetsIndex } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
 import { deleteTweetsDestroy, fetchTweetsIndex } from "../../apis/tweets";
 import { Pagination } from "../organisms/Pagination";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { signOut } from "../../apis/signout";
+import { useRecoilValue } from "recoil";
+import { currentUserState } from "../../store/currentUserState";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 export const Home = () => {
+  useCurrentUser();
+
+  const currentUser = useRecoilValue(currentUserState);
   const initialFetchState = {
     status: "INITIAL",
     data: [],
@@ -27,9 +33,10 @@ export const Home = () => {
   const [tweets, setTweets] = useState([]);
 
   const handleFetchTweets = useCallback(async () => {
-    await fetchTweetsDispatch({ type: fetchingActionTypes.FETCHING });
+    try {
+      fetchTweetsDispatch({ type: fetchingActionTypes.FETCHING });
 
-    await fetchTweetsIndex(currentPage).then((res) => {
+      const res = await fetchTweetsIndex(currentPage);
       fetchTweetsDispatch({
         type: res.type,
         payload: res,
@@ -40,12 +47,17 @@ export const Home = () => {
           authFiled: callback.authFiled,
         },
       });
-    });
-  }, [currentPage, fetchTweetsDispatch, callback.authFiled]);
+    } catch (error) {
+      console.error("Error fetching tweets:", error);
+      fetchTweetsDispatch({ type: fetchingActionTypes.FETCH_FAILED });
+    }
+  }, [currentPage]);
 
   const handleTweetDelete = (id) => {
     deleteTweetsDestroy(id).then((deleteId) => {
-      setTweets([...tweets].filter((tweet) => tweet.id !== Number(deleteId)));
+      setTweets((prevTweets) =>
+        prevTweets.filter((tweet) => tweet.id !== Number(deleteId))
+      );
     });
   };
 
@@ -56,7 +68,7 @@ export const Home = () => {
     });
 
     handleFetchTweets();
-  }, [currentPage]);
+  }, [currentPage, handleFetchTweets]);
 
   const handleSignOut = async () => {
     const response = await signOut();
@@ -66,6 +78,10 @@ export const Home = () => {
   };
 
   const sideNavMemo = useMemo(() => <SideNav />, []);
+
+  if (!currentUser) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <HomeLayout
@@ -91,7 +107,7 @@ export const Home = () => {
             justify-between
             border-b border-gray-500
             md:border-r md:border-gray-500
-            py-4
+            py-6
             backdrop-blur-sm
           `}
           >
@@ -101,11 +117,27 @@ export const Home = () => {
             <span className="w-1/2 flex justify-center items-center">
               フォロー中
             </span>
-            <button onClick={handleSignOut} className="btn-logout">
-              ログアウト
-            </button>
           </nav>
         </>
+      }
+      tweetFormIcon={
+        <div className="size-[40px] mt-3">
+          <Link to={`/${currentUser.name}`}>
+            {currentUser.icon ? (
+              <img
+                className="object-cover rounded-full"
+                src={currentUser.icon}
+                alt="currentUserIcon"
+              />
+            ) : (
+              <img
+                className="object-cover rounded-full"
+                src="https://placehold.jp/400x400.png"
+                alt="currentUserDefaultIcon"
+              />
+            )}
+          </Link>
+        </div>
       }
       tweetForm={<TweetForm successAction={handleFetchTweets} />}
       loading={
@@ -118,16 +150,17 @@ export const Home = () => {
         </>
       }
       bodyContents={
-        fetchTweetsState.status === "OK" &&
-        tweets.map((tweet) => (
-          <div className="border-b border-gray-500 relative" key={tweet.id}>
-            <TweetCard
-              tweet={tweet}
-              type="index"
-              handleTweetDelete={() => handleTweetDelete(tweet.id)}
-            />
-          </div>
-        ))
+        <>
+          {tweets.map((tweet) => (
+            <div className="border-b border-gray-500 relative" key={tweet.id}>
+              <TweetCard
+                tweet={tweet}
+                type="index"
+                handleTweetDelete={() => handleTweetDelete(tweet.id)}
+              />
+            </div>
+          ))}
+        </>
       }
       pagination={
         <>
@@ -159,6 +192,25 @@ export const Home = () => {
       }
       sideContentsBody={
         <div className="sticky top-0 -z-10">
+          <div className="w-full flex justify-center">
+            <div
+              className={`
+                w-10/12
+                bg-zinc-900
+                rounded-xl
+              `}
+            ></div>
+          </div>
+          <div className="w-full flex justify-center">
+            <div
+              className={`
+                w-10/12
+                bg-zinc-900
+                rounded-xl
+                mt-3
+              `}
+            ></div>
+          </div>
           <div className="w-full flex justify-center mt-2">
             <div
               className={`

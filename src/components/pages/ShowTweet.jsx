@@ -8,8 +8,11 @@ import { useTweetsShow } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
 import { deleteTweetsDestroy, fetchTweetsShow } from "../../apis/tweets";
 import { TweetCard } from "../organisms/TweetCard";
+import { useRecoilValue } from "recoil";
+import { currentUserState } from "../../store/currentUserState";
 
 export const ShowTweet = () => {
+  const currentUser = useRecoilValue(currentUserState);
   const initialFetchState = {
     status: "INITIAL",
     data: [],
@@ -48,6 +51,10 @@ export const ShowTweet = () => {
       navigate(-1);
     });
   };
+
+  if (!currentUser) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <ShowTweetLayout

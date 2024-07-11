@@ -10,12 +10,14 @@ import { ShowTweet } from "./components/pages/ShowTweet";
 import { useAuthCheck } from "./hooks/auth";
 import { Profile } from "./components/pages/Profile";
 import { EditProfile } from "./components/pages/EditProfile";
+import { useCurrentUser } from "./hooks/useCurrentUser";
 
 function App() {
   const location = useLocation();
   const background = location.state?.background;
 
   useAuthCheck();
+  useCurrentUser();
 
   return (
     <>

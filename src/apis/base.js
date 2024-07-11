@@ -63,3 +63,7 @@ baseAxiosWithAuthHeaders.interceptors.response.use(
     }
   }
 );
+
+export const fetchCurrentUser = async () => {
+  return baseAxiosWithAuthHeaders.get("/auth/current_user");
+};
