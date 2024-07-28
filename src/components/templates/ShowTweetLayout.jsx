@@ -6,6 +6,8 @@ export const ShowTweetLayout = (props) => {
     header,
     loading,
     bodyContents,
+    commentForm,
+    comments,
     sideContentsHeader,
     sideContentsBody,
   } = props;
@@ -49,6 +51,10 @@ export const ShowTweetLayout = (props) => {
           >
             <div>{loading}</div>
             <div>{bodyContents}</div>
+            <div className="flex px-4 pt-3 pb-1 border-b border-gray-500">
+              {commentForm}
+            </div>
+            <div>{comments}</div>
           </div>
           <div
             className={`

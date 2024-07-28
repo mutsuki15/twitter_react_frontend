@@ -15,7 +15,7 @@ import { MdOutlineBlock } from "react-icons/md";
 import { ImEmbed2 } from "react-icons/im";
 import { RiFlag2Line } from "react-icons/ri";
 import { TweetImages } from "./TweetImages";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaTrashCan } from "react-icons/fa6";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store/currentUserState";
@@ -26,6 +26,8 @@ export const TweetCard = (props) => {
   const currentUser = useRecoilValue(currentUserState);
 
   const [menuOepn, setMenuOpen] = useState(false);
+
+  const location = useLocation();
 
   const handleTweetMenuOpen = () => {
     setMenuOpen(true);
@@ -212,6 +214,14 @@ export const TweetCard = (props) => {
           {type === "index" && (
             <>
               <span className="px-2 break-words whitespace-pre-wrap">
+                {tweet.parent && (
+                  <div>
+                    <span className="text-gray-400 mr-1">返信先:</span>
+                    <span className="text-twitter">
+                      @{tweet.parent.user.name}
+                    </span>
+                  </div>
+                )}
                 {tweet.content}
                 {tweet.images.length ? (
                   <div className="pt-4">
@@ -231,7 +241,11 @@ export const TweetCard = (props) => {
                     rounded-full
                     transition
                     hover:bg-sky-500 hover:bg-opacity-20 hover:text-sky-500`}
-                    to="/"
+                    to="/post"
+                    state={{
+                      backgroundLocation: location,
+                      parentTweet: tweet,
+                    }}
                   >
                     <BiMessageRounded className="w-[20px] h-[20px]" />
                   </Link>
@@ -301,6 +315,11 @@ export const TweetCard = (props) => {
       {type === "show" && (
         <>
           <div className="px-4 text-xl">
+            {tweet.parent && (
+              <div>
+                <span className="text-twitter">@{tweet.parent.user.name}</span>
+              </div>
+            )}
             <span>{tweet.content}</span>
             {tweet.images.length ? (
               <div className="pt-4">
@@ -335,7 +354,11 @@ export const TweetCard = (props) => {
                 rounded-full
                 transition
                 hover:bg-sky-500 hover:bg-opacity-20 hover:text-sky-500`}
-                to="/"
+                to="/post"
+                state={{
+                  backgroundLocation: location,
+                  parentTweet: tweet,
+                }}
               >
                 <BiMessageRounded className="w-[20px] h-[20px]" />
               </Link>

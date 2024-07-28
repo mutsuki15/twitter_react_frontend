@@ -4,10 +4,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SideNav } from "../organisms/SideNav";
 import { IoIosSearch } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useTweetsShow } from "../../hooks/tweets";
+import { useTweetCommentsIndex, useTweetsShow } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
-import { deleteTweetsDestroy, fetchTweetsShow } from "../../apis/tweets";
+import {
+  deleteTweetsDestroy,
+  fetchTweetsShow,
+  fetchTweetsShowComments,
+} from "../../apis/tweets";
 import { TweetCard } from "../organisms/TweetCard";
+import { TweetForm } from "../organisms/TweetForm";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store/currentUserState";
 
@@ -25,13 +30,16 @@ export const ShowTweet = () => {
   const { fetchTweetState, fetchTweetDispatch, callback } =
     useTweetsShow(initialFetchState);
 
-  useEffect(() => {
-    window.scroll({
-      top: 0,
-    });
-    fetchTweetDispatch({ type: fetchingActionTypes.FETCHING });
+  const {
+    fetchTweetCommentsState,
+    fetchTweetCommentsDispatch,
+    fetchTweetCommentsCallback,
+  } = useTweetCommentsIndex(initialFetchState);
 
-    fetchTweetsShow(id).then((res) => {
+  const [comments, setComments] = useState([]);
+
+  const handleFetchTweet = async () => {
+    await fetchTweetsShow(id).then((res) => {
       fetchTweetDispatch({
         type: res.type,
         payload: res,
@@ -40,15 +48,47 @@ export const ShowTweet = () => {
         },
       });
     });
+  };
+
+  const handleFetchComments = async () => {
+    await fetchTweetsShowComments(id).then((res) => {
+      fetchTweetCommentsDispatch({
+        type: res.type,
+        payload: res,
+        callback: {
+          success: () => {
+            setComments(res.data.comments);
+          },
+          authFiled: fetchTweetCommentsCallback.authFiled,
+        },
+      });
+    });
+  };
+
+  useEffect(() => {
+    handleFetchComments();
   }, []);
 
+  useEffect(() => {
+    window.scroll({
+      top: 0,
+    });
+
+    fetchTweetDispatch({ type: fetchingActionTypes.FETCHING });
+    fetchTweetCommentsDispatch({ type: fetchingActionTypes.FETCHING });
+
+    Promise.all([handleFetchTweet(), handleFetchComments()]);
+  }, [id]);
+
   const handlePrevClick = () => {
-    navigate(-1);
+    navigate(-1 || "/home");
   };
 
   const handleTweetDelete = (id) => {
-    deleteTweetsDestroy(id).then(() => {
-      navigate(-1);
+    deleteTweetsDestroy(id).then((deleteId) => {
+      setComments(
+        [...comments].filter((comment) => comment.id !== Number(deleteId))
+      );
     });
   };
 
@@ -88,16 +128,65 @@ export const ShowTweet = () => {
       }
       bodyContents={
         fetchTweetState.status === "OK" && (
-          <div className="h-screen">
+          <>
+            {fetchTweetState.data.tweet.parent && (
+              <div className="relative">
+                <TweetCard
+                  tweet={fetchTweetState.data.tweet.parent}
+                  type="index"
+                  handleTweetDelete={() =>
+                    handleTweetDelete(fetchTweetState.data.tweet.parent.id)
+                  }
+                />
+              </div>
+            )}
+            <div className="h-full">
+              <TweetCard
+                tweet={fetchTweetState.data.tweet}
+                type="show"
+                handleTweetDelete={() =>
+                  handleTweetDelete(fetchTweetState.data.tweet.id)
+                }
+              />
+            </div>
+            <div className="px-4 pt-3 flex">
+              <div className="w-1/12"></div>
+              <div className="w-full pl-3">
+                <span className="text-gray-400">
+                  返信先:
+                  <span className="ml-1 text-twitter">
+                    @{fetchTweetState.data.tweet.user.name}
+                  </span>
+                  <span className="text-gray-400">さん</span>
+                </span>
+              </div>
+            </div>
+          </>
+        )
+      }
+      commentForm={
+        fetchTweetState.status === "OK" && (
+          <TweetForm
+            successAction={handleFetchComments}
+            parentTweetId={fetchTweetState.data.tweet.id}
+            type="comment"
+          />
+        )
+      }
+      comments={
+        fetchTweetCommentsState.status === "OK" &&
+        comments.map((commentTweet) => (
+          <div
+            className="border-b border-gray-500 relative"
+            key={commentTweet.id}
+          >
             <TweetCard
-              tweet={fetchTweetState.data.tweet}
-              type="show"
-              handleTweetDelete={() =>
-                handleTweetDelete(fetchTweetState.data.tweet.id)
-              }
+              tweet={commentTweet}
+              type="index"
+              handleTweetDelete={() => handleTweetDelete(commentTweet.id)}
             />
           </div>
-        )
+        ))
       }
       sideContentsHeader={
         <div className="h-full flex justify-center items-center bg-black">

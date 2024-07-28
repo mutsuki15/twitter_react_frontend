@@ -8,22 +8,22 @@ import { useTweetsIndex } from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
 import { deleteTweetsDestroy, fetchTweetsIndex } from "../../apis/tweets";
 import { Pagination } from "../organisms/Pagination";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { signOut } from "../../apis/signout";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store/currentUserState";
-import { useCurrentUser } from "../../hooks/useCurrentUser";
 
 export const Home = () => {
+  const currentUser = useRecoilValue(currentUserState);
   useCurrentUser();
 
-  const currentUser = useRecoilValue(currentUserState);
   const initialFetchState = {
     status: "INITIAL",
     data: [],
   };
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const currentPage = searchParams.get("page") || 0;
 
@@ -68,7 +68,9 @@ export const Home = () => {
     });
 
     handleFetchTweets();
-  }, [currentPage, handleFetchTweets]);
+    searchParams.get("status") === "tweeted" && setSearchParams();
+    setSearchParams({ page: currentPage });
+  }, [currentPage, searchParams.get("status")]);
 
   const handleSignOut = async () => {
     const response = await signOut();
@@ -119,25 +121,6 @@ export const Home = () => {
             </span>
           </nav>
         </>
-      }
-      tweetFormIcon={
-        <div className="size-[40px] mt-3">
-          <Link to={`/${currentUser.name}`}>
-            {currentUser.icon ? (
-              <img
-                className="object-cover rounded-full"
-                src={currentUser.icon}
-                alt="currentUserIcon"
-              />
-            ) : (
-              <img
-                className="object-cover rounded-full"
-                src="https://placehold.jp/400x400.png"
-                alt="currentUserDefaultIcon"
-              />
-            )}
-          </Link>
-        </div>
       }
       tweetForm={<TweetForm successAction={handleFetchTweets} />}
       loading={

@@ -39,10 +39,10 @@ export const postRegistrationCreate = (formData) => {
     }));
 };
 
-export const fetchUsersShow = (name) => {
+export const fetchUsersShow = (name, tab) => {
   return baseAxiosWithAuthHeaders
     .get(users + `/${name}`, {
-      params: { name: name },
+      params: { tab: tab },
     })
     .then((res) => ({
       type: fetchingActionTypes.FETCH_SUCCESS,
