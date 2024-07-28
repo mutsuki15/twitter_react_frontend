@@ -8,3 +8,4 @@ export const tweets = "/tweets";
 export const images = "/images";
 export const comments = "/comments";
 export const retweets = "/retweets";
+export const favorites = "/favorites";
