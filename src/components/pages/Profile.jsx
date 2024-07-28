@@ -25,31 +25,28 @@ export const Profile = () => {
   const currentUser = useRecoilValue(currentUserState);
   const initialFetchState = {
     status: "INITIAL",
-    data: [],
+    data: { user: {}, tweets: [] },
   };
 
   const { name } = useParams();
-
   const location = useLocation();
-
   const [searchParams] = useSearchParams();
-  const isTab = searchParams.get("tab") || "tweets";
+  const [tab, setTab] = useState(searchParams.get("tab") || "tweets");
 
   const { fetchUserState, fetchUserDispatch, callback } =
     useUsersShow(initialFetchState);
-
   const [tweets, setTweets] = useState([]);
 
   const handleTweetDelete = (id) => {
     deleteTweetsDestroy(id).then((deleteId) => {
-      setTweets([...tweets].filter((tweet) => tweet.id !== Number(deleteId)));
+      setTweets(tweets.filter((tweet) => tweet.id !== Number(deleteId)));
     });
   };
 
   useEffect(() => {
     fetchUserDispatch({ type: fetchingActionTypes.FETCHING });
 
-    fetchUsersShow(name).then((res) => {
+    fetchUsersShow(name, tab).then((res) => {
       fetchUserDispatch({
         type: res.type,
         payload: res,
@@ -61,7 +58,11 @@ export const Profile = () => {
         },
       });
     });
-  }, [location]);
+  }, [location, tab]);
+
+  const handleTabChange = (tabName) => {
+    setTab(tabName);
+  };
 
   if (!currentUser) {
     return <div>Loading...</div>;
@@ -72,13 +73,7 @@ export const Profile = () => {
       header={
         <>
           {fetchUserState.status !== "LOADING" && "INITIAL" && (
-            <nav
-              className={`
-              flex justify-between
-              py-2
-              backdrop-blur-sm
-            `}
-            >
+            <nav className="flex justify-between py-2 backdrop-blur-sm">
               <div className="flex justify-center items-center px-4">
                 <Link className="mr-8" to="/home">
                   <FaArrowLeft />
@@ -131,12 +126,7 @@ export const Profile = () => {
                 {fetchUserState.data.is_current_user ? (
                   <Link
                     to="/settings/profile"
-                    className={`
-                    h-[34px] text-sm px-5
-                    flex justify-center items-center
-                    transition border rounded-full
-                    hover:bg-opacity-10 hover:bg-white
-                    `}
+                    className="h-[34px] text-sm px-5 flex justify-center items-center transition border rounded-full hover:bg-opacity-10 hover:bg-white"
                     state={{
                       backgroundLocation: location,
                       user: fetchUserState.data.user,
@@ -146,44 +136,16 @@ export const Profile = () => {
                   </Link>
                 ) : (
                   <>
-                    <button
-                      className={`
-                      size-[34px]
-                      flex justify-center items-center
-                      border rounded-full mr-3 transition
-                      hover:bg-opacity-10 hover:bg-white
-                    `}
-                    >
+                    <button className="size-[34px] flex justify-center items-center border rounded-full mr-3 transition hover:bg-opacity-10 hover:bg-white">
                       <IoIosMore />
                     </button>
-                    <button
-                      className={`
-                      size-[34px]
-                      flex justify-center items-center
-                      border rounded-full mr-3 transition
-                      hover:bg-opacity-10 hover:bg-white
-                    `}
-                    >
+                    <button className="size-[34px] flex justify-center items-center border rounded-full mr-3 transition hover:bg-opacity-10 hover:bg-white">
                       <LuMail />
                     </button>
-                    <button
-                      className={`
-                      size-[34px]
-                      flex justify-center items-center
-                      border rounded-full mr-3 transition
-                      hover:bg-opacity-10 hover:bg-white
-                    `}
-                    >
+                    <button className="size-[34px] flex justify-center items-center border rounded-full mr-3 transition hover:bg-opacity-10 hover:bg-white">
                       <LuBellPlus />
                     </button>
-                    <button
-                      className={`
-                      h-[34px] px-4
-                      flex justify-center items-center
-                      border rounded-full mr-3 transition
-                      hover:bg-opacity-10 hover:bg-white
-                    `}
-                    >
+                    <button className="h-[34px] px-4 flex justify-center items-center border rounded-full mr-3 transition hover:bg-opacity-10 hover:bg-white">
                       フォロー中
                     </button>
                   </>
@@ -237,49 +199,38 @@ export const Profile = () => {
               </div>
               <div className="flex h-[50px] my-1 mt-2">
                 <div
-                  className={`
-                    w-1/4 h-full
-                    relative
-                    flex justify-center items-center
-                    hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
-                  `}
+                  className={`w-1/4 h-full relative flex justify-center items-center hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition`}
+                  onClick={() => handleTabChange("tweets")}
                 >
                   <span
                     className={`${
-                      isTab === "tweets" &&
-                      `before:bg-twitter
-                        before:h-1 before:w-1/2
-                        before:absolute before:rounded-full
-                        before:left-1/4 before:bottom-0`
+                      tab === "tweets" &&
+                      `before:bg-twitter before:h-1 before:w-1/2 before:absolute before:rounded-full before:left-1/4 before:bottom-0`
                     }`}
                   >
                     ツイート
                   </span>
                 </div>
                 <div
-                  className={`
-                  w-1/4 h-full
-                  flex justify-center items-center
-                  hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
-                `}
+                  className={`w-1/4 h-full relative flex justify-center items-center hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition`}
+                  onClick={() => handleTabChange("comments")}
                 >
-                  <span>返信</span>
+                  <span
+                    className={`${
+                      tab === "comments" &&
+                      `before:bg-twitter before:h-1 before:w-1/2 before:absolute before:rounded-full before:left-1/4 before:bottom-0`
+                    }`}
+                  >
+                    返信
+                  </span>
                 </div>
                 <div
-                  className={`
-                  w-1/4 h-full
-                  flex justify-center items-center
-                  hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
-                `}
+                  className={`w-1/4 h-full flex justify-center items-center hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition`}
                 >
                   <span>メディア</span>
                 </div>
                 <div
-                  className={`
-                  w-1/4 h-full
-                  flex justify-center items-center
-                  hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition
-                `}
+                  className={`w-1/4 h-full flex justify-center items-center hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition`}
                 >
                   <span>いいね</span>
                 </div>
@@ -303,15 +254,7 @@ export const Profile = () => {
       sideContentsHeader={
         <div className="h-full flex justify-center items-center bg-black">
           <div
-            className={`
-            h-5/6
-            w-10/12
-            flex items-center
-            bg-zinc-900
-            text-gray-400
-            rounded-full
-            ps-3
-          `}
+            className={`h-5/6 w-10/12 flex items-center bg-zinc-900 text-gray-400 rounded-full ps-3`}
           >
             <IoIosSearch className="h-full size-6 mr-3" />
             <span>検索</span>
@@ -321,14 +264,7 @@ export const Profile = () => {
       sideContentsBody={
         <div className="sticky top-0 -z-10">
           <div className="w-full flex justify-center mt-2">
-            <div
-              className={`
-              w-10/12
-              bg-zinc-900
-              rounded-xl
-              mt-3
-            `}
-            >
+            <div className={`w-10/12 bg-zinc-900 rounded-xl mt-3`}>
               <div className="p-3">
                 <h4 className="font-bold text-xl mb-1">おすすめユーザー</h4>
                 <ul>

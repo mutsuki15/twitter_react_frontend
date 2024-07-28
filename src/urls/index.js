@@ -6,3 +6,4 @@ export const signOut = "/sign_out";
 export const validateToken = "/validate_token";
 export const tweets = "/tweets";
 export const images = "/images";
+export const comments = "/comments";
