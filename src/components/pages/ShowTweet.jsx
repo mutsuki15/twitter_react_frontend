@@ -1,15 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { ShowTweetLayout } from "../templates/ShowTweetLayout";
 import { useNavigate, useParams } from "react-router-dom";
 import { SideNav } from "../organisms/SideNav";
 import { IoIosSearch } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useTweetCommentsIndex, useTweetsShow } from "../../hooks/tweets";
+import {
+  useTweetAction,
+  useTweetCommentsIndex,
+  useTweetsShow,
+} from "../../hooks/tweets";
 import { fetchingActionTypes } from "../../apis/base";
 import {
   deleteTweetsDestroy,
   fetchTweetsShow,
   fetchTweetsShowComments,
+  retweetTweetsToggle,
 } from "../../apis/tweets";
 import { TweetCard } from "../organisms/TweetCard";
 import { TweetForm } from "../organisms/TweetForm";
@@ -36,7 +41,9 @@ export const ShowTweet = () => {
     fetchTweetCommentsCallback,
   } = useTweetCommentsIndex(initialFetchState);
 
-  const [comments, setComments] = useState([]);
+  const [comments, commentsDispatch] = useTweetAction();
+  const [parent, parentDispatch] = useTweetAction();
+  const [tweet, tweetDispatch] = useTweetAction();
 
   const handleFetchTweet = async () => {
     await fetchTweetsShow(id).then((res) => {
@@ -44,6 +51,14 @@ export const ShowTweet = () => {
         type: res.type,
         payload: res,
         callback: {
+          success: () => {
+            res.data.tweet.parent &&
+              parentDispatch({
+                type: "set",
+                data: new Array(res.data.tweet.parent),
+              });
+            tweetDispatch({ type: "set", data: new Array(res.data.tweet) });
+          },
           authFiled: callback.authFiled,
         },
       });
@@ -57,7 +72,10 @@ export const ShowTweet = () => {
         payload: res,
         callback: {
           success: () => {
-            setComments(res.data.comments);
+            commentsDispatch({
+              type: "set",
+              data: res.data.comments,
+            });
           },
           authFiled: fetchTweetCommentsCallback.authFiled,
         },
@@ -84,11 +102,47 @@ export const ShowTweet = () => {
     navigate(-1 || "/home");
   };
 
-  const handleTweetDelete = (id) => {
+  const handleTweetDelete = (id, type) => {
     deleteTweetsDestroy(id).then((deleteId) => {
-      setComments(
-        [...comments].filter((comment) => comment.id !== Number(deleteId))
-      );
+      type === "comments"
+        ? commentsDispatch({
+            type: "delete",
+            id: deleteId,
+          })
+        : type === "tweet"
+        ? tweetDispatch({
+            type: "delete",
+            id: deleteId,
+          })
+        : parentDispatch({
+            type: "delete",
+            id: deleteId,
+          });
+    });
+  };
+
+  const handleTweetRetweet = (tweet, type) => {
+    retweetTweetsToggle(tweet.id).then((res) => {
+      type === "comments"
+        ? commentsDispatch({
+            type: "toggleRetweet",
+            id: res.id,
+            status: res.status,
+            count: tweet.action.retweet.count,
+          })
+        : type === "tweet"
+        ? tweetDispatch({
+            type: "toggleRetweet",
+            id: res.id,
+            status: res.status,
+            count: tweet.action.retweet.count,
+          })
+        : parentDispatch({
+            type: "toggleRetweet",
+            id: res.id,
+            status: res.status,
+            count: tweet.action.retweet.count,
+          });
     });
   };
 
@@ -134,9 +188,13 @@ export const ShowTweet = () => {
                 <TweetCard
                   tweet={fetchTweetState.data.tweet.parent}
                   type="index"
-                  handleTweetDelete={() =>
-                    handleTweetDelete(fetchTweetState.data.tweet.parent.id)
-                  }
+                  handleTweetDelete={() => {
+                    handleTweetDelete(parent[0].id);
+                    navigate("/home");
+                  }}
+                  handleTweetRetweet={() => {
+                    handleTweetRetweet(parent[0]);
+                  }}
                 />
               </div>
             )}
@@ -144,9 +202,13 @@ export const ShowTweet = () => {
               <TweetCard
                 tweet={fetchTweetState.data.tweet}
                 type="show"
-                handleTweetDelete={() =>
-                  handleTweetDelete(fetchTweetState.data.tweet.id)
-                }
+                handleTweetDelete={() => {
+                  handleTweetDelete(tweet[0].id, "tweet");
+                  navigate("/home");
+                }}
+                handleTweetRetweet={() => {
+                  handleTweetRetweet(tweet[0], "tweet");
+                }}
               />
             </div>
             <div className="px-4 pt-3 flex">
@@ -183,7 +245,12 @@ export const ShowTweet = () => {
             <TweetCard
               tweet={commentTweet}
               type="index"
-              handleTweetDelete={() => handleTweetDelete(commentTweet.id)}
+              handleTweetDelete={() =>
+                handleTweetDelete(commentTweet.id, "comments")
+              }
+              handleTweetRetweet={() =>
+                handleTweetRetweet(commentTweet, "comments")
+              }
             />
           </div>
         ))
