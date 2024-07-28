@@ -10,6 +10,7 @@ import {
   deleteTweetsDestroy,
   fetchTweetsIndex,
   retweetTweetsToggle,
+  favoriteTweetsToggle,
 } from "../../apis/tweets";
 import { Pagination } from "../organisms/Pagination";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -73,6 +74,17 @@ export const Home = () => {
         id: res.id,
         status: res.status,
         count: tweet.action.retweet.count,
+      });
+    });
+  };
+
+  const handleTweetFavorite = (tweet) => {
+    favoriteTweetsToggle(tweet.id).then((res) => {
+      tweetsDispatch({
+        type: "toggleFavorite",
+        id: res.id,
+        status: res.status,
+        count: tweet.action.favorite.count,
       });
     });
   };
@@ -157,6 +169,7 @@ export const Home = () => {
                 type="index"
                 handleTweetDelete={() => handleTweetDelete(tweet.id)}
                 handleTweetRetweet={() => handleTweetRetweet(tweet)}
+                handleTweetFavorite={() => handleTweetFavorite(tweet)}
               />
             </div>
           ))}
