@@ -17,7 +17,11 @@ import { fetchingActionTypes } from "../../apis/base";
 import { TweetCard } from "../organisms/TweetCard";
 import { CiLocationOn } from "react-icons/ci";
 import { PiLinkSimpleBold } from "react-icons/pi";
-import { deleteTweetsDestroy, retweetTweetsToggle } from "../../apis/tweets";
+import {
+  deleteTweetsDestroy,
+  favoriteTweetsToggle,
+  retweetTweetsToggle,
+} from "../../apis/tweets";
 import { useTweetAction } from "../../hooks/tweets";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store/currentUserState";
@@ -55,6 +59,17 @@ export const Profile = () => {
         id: res.id,
         status: res.status,
         count: tweet.action.retweet.count,
+      });
+    });
+  };
+
+  const handleTweetFavorite = (tweet) => {
+    favoriteTweetsToggle(tweet.id).then((res) => {
+      tweetsDispatch({
+        type: "toggleFavorite",
+        id: res.id,
+        status: res.status,
+        count: tweet.action.favorite.count,
       });
     });
   };
@@ -246,9 +261,17 @@ export const Profile = () => {
                   <span>メディア</span>
                 </div>
                 <div
-                  className={`w-1/4 h-full flex justify-center items-center hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition`}
+                  className={`w-1/4 h-full relative flex justify-center items-center hover:bg-white hover:bg-opacity-5 hover:cursor-pointer transition`}
+                  onClick={() => handleTabChange("favorites")}
                 >
-                  <span>いいね</span>
+                  <span
+                    className={`${
+                      tab === "favorites" &&
+                      `before:bg-twitter before:h-1 before:w-1/2 before:absolute before:rounded-full before:left-1/4 before:bottom-0`
+                    }`}
+                  >
+                    いいね
+                  </span>
                 </div>
               </div>
             </div>
@@ -264,6 +287,7 @@ export const Profile = () => {
               type="index"
               handleTweetDelete={() => handleTweetDelete(tweet.id)}
               handleTweetRetweet={() => handleTweetRetweet(tweet)}
+              handleTweetFavorite={() => handleTweetFavorite(tweet)}
             />
           </div>
         ))
