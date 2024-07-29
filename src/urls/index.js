@@ -9,3 +9,5 @@ export const images = "/images";
 export const comments = "/comments";
 export const retweets = "/retweets";
 export const favorites = "/favorites";
+export const follow = "/follow";
+export const unfollow = "/unfollow";

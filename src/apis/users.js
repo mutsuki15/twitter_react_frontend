@@ -1,4 +1,4 @@
-import { users } from "../urls/index";
+import { users, follow, unfollow } from "../urls/index";
 import {
   baseAxios,
   baseAxiosWithAuthHeaders,
@@ -67,4 +67,20 @@ export const patchUsersUpdate = (name, formData) => {
       type: patchActionTypes.PATCH_FAILED,
       errors: e.response.data.errors,
     }));
+};
+
+export const postFollowsCreate = (name) => {
+  return baseAxiosWithAuthHeaders
+    .post(`${users}/${name}${follow}`)
+    .catch((e) => {
+      return Promise.reject(e);
+    });
+};
+
+export const deleteUnfollowDestroy = (name) => {
+  return baseAxiosWithAuthHeaders
+    .delete(`${users}/${name}${unfollow}`)
+    .catch((e) => {
+      return Promise.reject(e);
+    });
 };

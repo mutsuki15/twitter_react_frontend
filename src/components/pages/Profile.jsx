@@ -12,7 +12,11 @@ import { IoIosMore, IoIosSearch } from "react-icons/io";
 import { LuMail } from "react-icons/lu";
 import { LuBellPlus } from "react-icons/lu";
 import { useUsersShow } from "../../hooks/signup";
-import { fetchUsersShow } from "../../apis/users";
+import {
+  fetchUsersShow,
+  postFollowsCreate,
+  deleteUnfollowDestroy,
+} from "../../apis/users";
 import { fetchingActionTypes } from "../../apis/base";
 import { TweetCard } from "../organisms/TweetCard";
 import { CiLocationOn } from "react-icons/ci";
@@ -40,6 +44,8 @@ export const Profile = () => {
 
   const { fetchUserState, fetchUserDispatch, callback } =
     useUsersShow(initialFetchState);
+
+  const [showUser, setShowUser] = useState({});
 
   const [tweets, tweetsDispatch] = useTweetAction();
 
@@ -83,6 +89,7 @@ export const Profile = () => {
         payload: res,
         callback: {
           success: () => {
+            setShowUser(res.data.user);
             tweetsDispatch({ type: "set", data: res.data.tweets });
           },
           authFiled: callback.authFiled,
@@ -90,6 +97,24 @@ export const Profile = () => {
       });
     });
   }, [location, tab]);
+
+  const handleFollowToggle = (userName) => {
+    showUser.action.follow
+      ? deleteUnfollowDestroy(userName).then(() => {
+          const newShowUserState = {
+            ...showUser,
+            action: { follow: false },
+          };
+          setShowUser(newShowUserState);
+        })
+      : postFollowsCreate(userName).then(() => {
+          const newShowUserState = {
+            ...showUser,
+            action: { follow: true },
+          };
+          setShowUser(newShowUserState);
+        });
+  };
 
   const handleTabChange = (tabName) => {
     setTab(tabName);
@@ -136,19 +161,13 @@ export const Profile = () => {
               <div className="w-full h-[200px] relative">
                 <img
                   className="w-full h-full object-cover"
-                  src={
-                    fetchUserState.data.user.header ||
-                    "https://placehold.jp/1500x500.png"
-                  }
+                  src={showUser.header || "https://placehold.jp/1500x500.png"}
                   alt="header"
                 />
                 <div className="size-[135px] absolute -bottom-1/4 left-4">
                   <img
                     className="w-full h-full object-cover rounded-full border-4 border-black"
-                    src={
-                      fetchUserState.data.user.icon ||
-                      "https://placehold.jp/400x400.png"
-                    }
+                    src={showUser.icon || "https://placehold.jp/400x400.png"}
                     alt="header"
                   />
                 </div>
@@ -160,7 +179,7 @@ export const Profile = () => {
                     className="h-[34px] text-sm px-5 flex justify-center items-center transition border rounded-full hover:bg-opacity-10 hover:bg-white"
                     state={{
                       backgroundLocation: location,
-                      user: fetchUserState.data.user,
+                      user: showUser,
                     }}
                   >
                     プロフィールを編集
@@ -176,42 +195,59 @@ export const Profile = () => {
                     <button className="size-[34px] flex justify-center items-center border rounded-full mr-3 transition hover:bg-opacity-10 hover:bg-white">
                       <LuBellPlus />
                     </button>
-                    <button className="h-[34px] px-4 flex justify-center items-center border rounded-full mr-3 transition hover:bg-opacity-10 hover:bg-white">
-                      フォロー中
+                    <button
+                      className={`
+                      ${
+                        showUser.action.follow &&
+                        "hover:border-red-500 hover:text-red-500"
+                      }
+                      relative
+                      h-[34px] w-[124px]
+                      border rounded-full mr-3 transition
+                      hover:bg-opacity-10 hover:bg-white
+                    `}
+                      onClick={() => handleFollowToggle(showUser.name)}
+                    >
+                      {showUser.action.follow ? (
+                        <>
+                          <div className="absolute rounded-full bg-black size-full top-0 left-0 flex justify-center items-center hover:opacity-0 z-10">
+                            <span>フォロー中</span>
+                          </div>
+                          <div className="absolute size-full top-0 left-0 flex justify-center items-center z-0">
+                            <span className="text-red-500">フォロー解除</span>
+                          </div>
+                        </>
+                      ) : (
+                        <span>フォロー</span>
+                      )}
                     </button>
                   </>
                 )}
               </div>
               <div className="px-3 pb-4 flex flex-col">
-                <span className="font-bold text-xl">
-                  {fetchUserState.data.user?.name}
-                </span>
-                <span className="text-gray-400">
-                  @{fetchUserState.data.user?.name}
-                </span>
+                <span className="font-bold text-xl">{showUser.name}</span>
+                <span className="text-gray-400">@{showUser.name}</span>
               </div>
               <div className="px-3">
-                <span>{fetchUserState.data.user?.bio}</span>
+                <span>{showUser.bio}</span>
               </div>
               <div className="px-3 py-2">
                 <span className="text-gray-400 flex items-center">
-                  {fetchUserState.data.user?.location && (
+                  {showUser.location && (
                     <>
                       <CiLocationOn />
-                      <span className="mr-2">
-                        {fetchUserState.data.user.location}
-                      </span>
+                      <span className="mr-2">{showUser.location}</span>
                     </>
                   )}
-                  {fetchUserState.data.user?.website && (
+                  {showUser.website && (
                     <>
                       <PiLinkSimpleBold />
                       {
                         <a
                           className="text-twitter hover:underline"
-                          href={fetchUserState.data.user?.website}
+                          href={showUser.website}
                         >
-                          {fetchUserState.data.user?.website}
+                          {showUser.website}
                         </a>
                       }
                     </>
@@ -220,11 +256,15 @@ export const Profile = () => {
               </div>
               <div className="px-3 flex">
                 <div className="mr-3">
-                  <span className="font-semibold mr-1">11</span>
+                  <span className="font-semibold mr-1">
+                    {showUser.followings_count}
+                  </span>
                   <span className="text-gray-400">フォロー中</span>
                 </div>
                 <div>
-                  <span className="font-semibold mr-1">22</span>
+                  <span className="font-semibold mr-1">
+                    {showUser.followers_count}
+                  </span>
                   <span className="text-gray-400">フォロワー</span>
                 </div>
               </div>

@@ -31,7 +31,7 @@ export const SideNav = () => {
   };
 
   return (
-    <>
+    <div className="fixed xl:w-auto md:w-[50px]">
       <div
         className={`
         w-11/12 h-[52px]
@@ -251,6 +251,7 @@ export const SideNav = () => {
               flex justify-center items-center
               hover:bg-gray-800 hover:bg-opacity-70 hover:rounded-full
               xl:px-3
+              md:px-2 mt-2
             `}
             >
               <div className="xl:mr-3 w-3/12 relative">
@@ -287,12 +288,11 @@ export const SideNav = () => {
             {isDropdownOpen && (
               <div
                 className={`
-                w-[300px] z-40
+                w-[300px]
                 bg-black
-                absolute bottom-12 right-0
+                absolute bottom-12 left-0
                 drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]
                 rounded-2xl
-                md:translate-x-0 translate-x-[-75%] md:right-0 right-[-10px]
               `}
               >
                 <div
@@ -314,6 +314,6 @@ export const SideNav = () => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosMore } from "react-icons/io";
 import { BiMessageRounded } from "react-icons/bi";
 import { FaRetweet } from "react-icons/fa";
@@ -10,7 +10,7 @@ import { MdOutlineFileUpload } from "react-icons/md";
 import { BsPin } from "react-icons/bs";
 import { BsStars } from "react-icons/bs";
 import { RiFileList2Fill } from "react-icons/ri";
-import { BsFillPersonXFill } from "react-icons/bs";
+import { BsFillPersonXFill, BsPersonPlusFill } from "react-icons/bs";
 import { BiSolidVolumeMute } from "react-icons/bi";
 import { MdOutlineBlock } from "react-icons/md";
 import { ImEmbed2 } from "react-icons/im";
@@ -18,8 +18,10 @@ import { RiFlag2Line } from "react-icons/ri";
 import { TweetImages } from "./TweetImages";
 import { Link, useLocation } from "react-router-dom";
 import { FaTrashCan } from "react-icons/fa6";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { currentUserState } from "../../store/currentUserState";
+import { postFollowsCreate, deleteUnfollowDestroy } from "../../apis/users";
+import { followState } from "../../store/followState";
 
 export const TweetCard = (props) => {
   const {
@@ -31,10 +33,17 @@ export const TweetCard = (props) => {
   } = props;
 
   const currentUser = useRecoilValue(currentUserState);
-
-  const [menuOepn, setMenuOpen] = useState(false);
+  const [followMap, setFollowMap] = useRecoilState(followState);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const location = useLocation();
+
+  useEffect(() => {
+    setFollowMap((prev) => ({
+      ...prev,
+      [tweet.user.id]: tweet.user.action.follow,
+    }));
+  }, [tweet.user.id, tweet.user.action.follow, setFollowMap]);
 
   const handleTweetMenuOpen = () => {
     setMenuOpen(true);
@@ -42,6 +51,24 @@ export const TweetCard = (props) => {
 
   const handleTweetMenuClose = () => {
     setMenuOpen(false);
+  };
+
+  const handleFollowToggle = () => {
+    if (followMap[tweet.user.id]) {
+      deleteUnfollowDestroy(tweet.user.name).then(() => {
+        setFollowMap((prev) => ({
+          ...prev,
+          [tweet.user.id]: false,
+        }));
+      });
+    } else {
+      postFollowsCreate(tweet.user.name).then(() => {
+        setFollowMap((prev) => ({
+          ...prev,
+          [tweet.user.id]: true,
+        }));
+      });
+    }
   };
 
   return (
@@ -108,7 +135,7 @@ export const TweetCard = (props) => {
                 </div>
               )}
             </div>
-            {menuOepn ? (
+            {menuOpen ? (
               <>
                 <div className="size-8"></div>
                 <div
@@ -168,10 +195,22 @@ export const TweetCard = (props) => {
                         </>
                       ) : (
                         <>
-                          <span className="flex items-center gap-x-2">
-                            <BsFillPersonXFill size={19} />@{tweet.user.name}
-                            さんのフォローを解除
-                          </span>
+                          <button
+                            className={`w-full flex items-center gap-x-2`}
+                            onClick={handleFollowToggle}
+                          >
+                            {followMap[tweet.user.id] ? (
+                              <>
+                                <BsFillPersonXFill size={19} />@
+                                {tweet.user.name} さんのフォローを解除
+                              </>
+                            ) : (
+                              <>
+                                <BsPersonPlusFill size={19} />@{tweet.user.name}{" "}
+                                さんをフォロー
+                              </>
+                            )}
+                          </button>
                           <span className="flex items-center gap-x-2">
                             <RiFileList2Fill size={19} />@{tweet.user.name}
                             さんをリストに追加/削除
