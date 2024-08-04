@@ -1,6 +1,7 @@
 import React from "react";
 import { MdFavorite } from "react-icons/md";
 import { IoPerson } from "react-icons/io5";
+import { FaRetweet } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export const NotificationCard = (props) => {
@@ -16,6 +17,8 @@ export const NotificationCard = (props) => {
       <div className="w-[40px] flex justify-center">
         {notice.type === "いいね" ? (
           <MdFavorite className="text-pink-500" size={32} />
+        ) : notice.type === "リツイート" ? (
+          <FaRetweet className="text-green-500" size={32} />
         ) : (
           <IoPerson className="text-sky-500" size={32} />
         )}
@@ -43,6 +46,21 @@ export const NotificationCard = (props) => {
                 {notice.user.name}
               </Link>
               さんがあなたのツイートをいいねしました
+              <div>
+                <Link
+                  className="text-gray-500"
+                  to={`/tweets/${notice.tweet.id}`}
+                >
+                  <span>{notice.tweet.content}</span>
+                </Link>
+              </div>
+            </div>
+          ) : notice.type === "リツイート" ? (
+            <div>
+              <Link className="font-semibold" to={`/${notice.user.name}`}>
+                {notice.user.name}
+              </Link>
+              さんがあなたのツイートをリツイートしました
               <div>
                 <Link
                   className="text-gray-500"

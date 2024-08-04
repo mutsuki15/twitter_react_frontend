@@ -34,60 +34,36 @@ export const Notifications = () => {
               data: res.data.notices,
             });
           },
-          authFiled: callback.authFiled,
+          authFailed: callback.authFailed,
         },
       })
     );
   }, []);
 
-  console.log(tweets);
-
   return (
     <NotificationsLayout
       header={
-        <>
-          <nav
-            className={`
-            h-full
-            flex justify-between items-center
-            backdrop-blur-sm
-          `}
-          >
-            <div className="flex justify-center items-center px-4">
-              <span className="mr-8 font-bold text-[20px]">通知</span>
-              <div className="flex flex-col">
-                <span className="font-bold text-xl"></span>
-                <small className="text-gray-400"></small>
-              </div>
-            </div>
-          </nav>
-        </>
+        <nav className="h-full flex justify-between items-center backdrop-blur-sm">
+          <div className="flex justify-center items-center px-4">
+            <span className="mr-8 font-bold text-[20px]">通知</span>
+          </div>
+        </nav>
       }
       notifications={
         fetchNotificationsState.status === "OK" &&
         fetchNotificationsState.data.notices.map((notice) => {
           return notice.type === "コメント" ? (
-            <div className="border-b border-gray-500 relative">
+            <div className="border-b border-gray-500 relative" key={notice.id}>
               <TweetCard tweet={notice.tweet} type="index" />
             </div>
           ) : (
-            <NotificationCard notice={notice} />
+            <NotificationCard notice={notice} key={notice.id} />
           );
         })
       }
       sideContentsHeader={
         <div className="h-full flex justify-center items-center bg-black">
-          <div
-            className={`
-            h-5/6
-            w-10/12
-            flex items-center
-            bg-zinc-900
-            text-gray-400
-            rounded-full
-            ps-3
-          `}
-          >
+          <div className="h-5/6 w-10/12 flex items-center bg-zinc-900 text-gray-400 rounded-full ps-3">
             <IoIosSearch className="h-full size-6 mr-3" />
             <span>検索</span>
           </div>
@@ -96,14 +72,7 @@ export const Notifications = () => {
       sideContentsBody={
         <div className="sticky top-0 -z-10">
           <div className="w-full flex justify-center mt-2">
-            <div
-              className={`
-              w-10/12
-              bg-zinc-900
-              rounded-xl
-              mt-3
-            `}
-            >
+            <div className="w-10/12 bg-zinc-900 rounded-xl mt-3">
               <div className="p-3">
                 <h4 className="font-bold text-xl mb-1">おすすめユーザー</h4>
                 <ul>

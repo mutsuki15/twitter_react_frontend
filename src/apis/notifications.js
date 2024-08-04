@@ -8,10 +8,13 @@ export const fetchNotificationsIndex = () => {
       type: fetchingActionTypes.FETCH_SUCCESS,
       data: res.data,
     }))
-    .catch((e) => ({
-      type: e.isLogin
-        ? fetchingActionTypes.FETCH_FAILED
-        : fetchingActionTypes.AUTH_FAILED,
-      errors: e,
-    }));
+    .catch((error) => {
+      const authFailed = error.response?.status === 401;
+      return {
+        type: authFailed
+          ? fetchingActionTypes.AUTH_FAILED
+          : fetchingActionTypes.FETCH_FAILED,
+        errors: error,
+      };
+    });
 };
