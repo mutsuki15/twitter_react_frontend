@@ -11,3 +11,4 @@ export const retweets = "/retweets";
 export const favorites = "/favorites";
 export const follow = "/follow";
 export const unfollow = "/unfollow";
+export const notifications = "/notifications";

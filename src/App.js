@@ -11,6 +11,7 @@ import { useAuthCheck } from "./hooks/auth";
 import { Profile } from "./components/pages/Profile";
 import { EditProfile } from "./components/pages/EditProfile";
 import { useCurrentUser } from "./hooks/useCurrentUser";
+import { Notifications } from "./components/pages/Notifications";
 
 function App() {
   const location = useLocation();
@@ -26,6 +27,7 @@ function App() {
         <Route path="/signup" element={<SignUp />}></Route>
         <Route path="/signin" element={<SignIn />}></Route>
         <Route path="/home" element={<Home />}></Route>
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/post" element={<Post />} />
         <Route path="/photo/:id" element={<Photo />} />
         <Route path="/tweets/:id" element={<ShowTweet />} />
