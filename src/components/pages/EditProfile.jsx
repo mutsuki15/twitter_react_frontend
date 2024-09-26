@@ -30,12 +30,12 @@ export const EditProfile = () => {
     e.target.style.height = e.target.scrollHeight + "px";
   };
 
-  const hadnleHeaderChange = (e) => {
+  const handleHeaderChange = (e) => {
     const headerImage = URL.createObjectURL(e.target.files[0]);
     setHeaderImage(headerImage);
   };
 
-  const hadnleIconChange = (e) => {
+  const handleIconChange = (e) => {
     const iconImage = URL.createObjectURL(e.target.files[0]);
     setIconImage(iconImage);
   };
@@ -100,7 +100,7 @@ export const EditProfile = () => {
                 type="file"
                 name="user[header]"
                 accept="image/jpeg, image/png"
-                onChange={hadnleHeaderChange}
+                onChange={handleHeaderChange}
               />
               <div>
                 <div
@@ -129,7 +129,7 @@ export const EditProfile = () => {
                   type="file"
                   name="user[icon]"
                   accept="image/jpeg, image/png"
-                  onChange={hadnleIconChange}
+                  onChange={handleIconChange}
                 />
                 <div>
                   <div
