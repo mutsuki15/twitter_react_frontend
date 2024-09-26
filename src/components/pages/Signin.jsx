@@ -94,7 +94,7 @@ export const SignIn = () => {
               className="form-input-text"
               placeholder="パスワード"
               name="password"
-              type="text"
+              type="password"
             />
             <div className="h-10"></div>
           </div>
