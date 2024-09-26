@@ -14,7 +14,6 @@ import {
 } from "../../apis/tweets";
 import { Pagination } from "../organisms/Pagination";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { signOut } from "../../apis/signout";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useRecoilValue } from "recoil";
 import { currentUserState } from "../../store/currentUserState";
@@ -31,6 +30,7 @@ export const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const currentPage = searchParams.get("page") || 0;
+  const selectedTab = searchParams.get("tab") || "recommended";
 
   const { fetchTweetsState, fetchTweetsDispatch, callback } =
     useTweetsIndex(initialFetchState);
@@ -41,7 +41,10 @@ export const Home = () => {
     try {
       fetchTweetsDispatch({ type: fetchingActionTypes.FETCHING });
 
-      const res = await fetchTweetsIndex(currentPage);
+      const filter = selectedTab === "following" ? "following" : "recommended";
+
+      const res = await fetchTweetsIndex(currentPage, filter);
+
       fetchTweetsDispatch({
         type: res.type,
         payload: res,
@@ -53,10 +56,9 @@ export const Home = () => {
         },
       });
     } catch (error) {
-      console.error("Error fetching tweets:", error);
       fetchTweetsDispatch({ type: fetchingActionTypes.FETCH_FAILED });
     }
-  }, [currentPage]);
+  }, [currentPage, selectedTab, fetchTweetsDispatch, tweetsDispatch]);
 
   const handleTweetDelete = (id) => {
     deleteTweetsDestroy(id).then((deleteId) => {
@@ -96,16 +98,15 @@ export const Home = () => {
     });
 
     handleFetchTweets();
-    searchParams.get("status") === "tweeted" && setSearchParams();
-    setSearchParams({ page: currentPage });
-  }, [currentPage, searchParams.get("status")]);
 
-  const handleSignOut = async () => {
-    const response = await signOut();
-    if (response.status === 200) {
-      navigate("/");
+    if (searchParams.get("status") === "tweeted") {
+      setSearchParams((prev) => {
+        const params = new URLSearchParams(prev);
+        params.delete("status");
+        return params;
+      });
     }
-  };
+  }, [currentPage, selectedTab, handleFetchTweets, searchParams]);
 
   const sideNavMemo = useMemo(() => <SideNav />, []);
 
@@ -113,90 +114,112 @@ export const Home = () => {
     return <div>Loading...</div>;
   }
 
+  const handleTabClick = (tab) => {
+    if (tab !== selectedTab) {
+      setSearchParams({ tab: tab, page: 0 });
+    }
+  };
+
   return (
     <HomeLayout
       sideNav={sideNavMemo}
       header={
-        <>
-          <div
-            className={`
-            flex
-            justify-between
-            px-8
-            py-3
-            md:hidden
-          `}
-          >
-            <div>icon</div>
-            <div>icon</div>
-            <div>settings</div>
-          </div>
-          <nav
-            className={`
+        <nav
+          className={`
             flex
             justify-between
             border-b border-gray-500
             md:border-r md:border-gray-500
-            py-6
             backdrop-blur-sm
+            relative
           `}
+        >
+          <button
+            role="tab"
+            aria-selected={selectedTab === "recommended"}
+            className={`w-1/2 flex flex-col items-center justify-center cursor-pointer relative
+              ${
+                selectedTab === "recommended"
+                  ? "text-white font-bold"
+                  : "text-gray-500"
+              }
+              transition
+              py-3
+              hover:bg-white hover:bg-opacity-10
+            `}
+            onClick={() => handleTabClick("recommended")}
           >
-            <span className="w-1/2 flex justify-center items-center">
-              おすすめ
-            </span>
-            <span className="w-1/2 flex justify-center items-center">
-              フォロー中
-            </span>
-          </nav>
-        </>
+            <span>おすすめ</span>
+            {selectedTab === "recommended" && (
+              <span className="w-1/5 h-1 bg-blue-500 rounded-full mt-1"></span>
+            )}
+          </button>
+
+          <button
+            role="tab"
+            aria-selected={selectedTab === "following"}
+            className={`w-1/2 flex flex-col items-center justify-center cursor-pointer relative
+              ${
+                selectedTab === "following"
+                  ? "text-white font-bold"
+                  : "text-gray-500"
+              }
+              transition
+              py-3
+              hover:bg-white hover:bg-opacity-10
+            `}
+            onClick={() => handleTabClick("following")}
+          >
+            <span>フォロー中</span>
+            {selectedTab === "following" && (
+              <span className="w-1/5 h-1 bg-blue-500 rounded-full mt-1"></span>
+            )}
+          </button>
+        </nav>
       }
       tweetForm={<TweetForm successAction={handleFetchTweets} />}
       loading={
-        <>
-          {fetchTweetsState.status === "LOADING" && (
-            <div className="flex justify-center py-10 h-screen">
-              <div className="loading"></div>
-            </div>
-          )}
-        </>
+        fetchTweetsState.status === "LOADING" && (
+          <div className="flex justify-center py-10 h-screen">
+            <div className="loading"></div>
+          </div>
+        )
       }
-      bodyContents={
-        <>
-          {tweets.map((tweet) => (
-            <div className="border-b border-gray-500 relative" key={tweet.id}>
-              <TweetCard
-                tweet={tweet}
-                type="index"
-                handleTweetDelete={() => handleTweetDelete(tweet.id)}
-                handleTweetRetweet={() => handleTweetRetweet(tweet)}
-                handleTweetFavorite={() => handleTweetFavorite(tweet)}
-              />
-            </div>
-          ))}
-        </>
-      }
+      bodyContents={tweets.map((tweet) => (
+        <div className="border-b border-gray-500 relative" key={tweet.id}>
+          <TweetCard
+            tweet={tweet}
+            type="index"
+            handleTweetDelete={() => handleTweetDelete(tweet.id)}
+            handleTweetRetweet={() => handleTweetRetweet(tweet)}
+            handleTweetFavorite={() => handleTweetFavorite(tweet)}
+          />
+        </div>
+      ))}
       pagination={
-        <>
-          {fetchTweetsState.status === "OK" && (
-            <Pagination
-              next={fetchTweetsState.data.next}
-              afterNext={fetchTweetsState.data.after_next}
-            />
-          )}
-        </>
+        fetchTweetsState.status === "OK" && (
+          <Pagination
+            next={fetchTweetsState.data.next}
+            afterNext={fetchTweetsState.data.after_next}
+            onPageChange={(newPage) => {
+              setSearchParams({ tab: selectedTab, page: newPage });
+              console.log(`Page changed to: ${newPage}`);
+            }}
+          />
+        )
       }
       sideContentsHeader={
         <div className="h-full flex justify-center items-center bg-black">
           <div
             className={`
-                h-5/6
-                w-10/12
-                flex items-center
-                bg-zinc-900
-                text-gray-400
-                rounded-full
-                ps-3
-              `}
+              h-5/6
+              w-10/12
+              flex items-center
+              bg-zinc-900
+              text-gray-400
+              rounded-full
+              ps-3
+            `}
           >
             <IoIosSearch className="h-full size-6 mr-3" />
             <span>検索</span>
@@ -242,7 +265,9 @@ export const Home = () => {
                   <li className="py-4 font-bold">TestUser4</li>
                   <li className="py-4 font-bold">TestUser5</li>
                 </ul>
-                <small className="text-twitter">さらに表示</small>
+                <small className="text-twitter cursor-pointer">
+                  さらに表示
+                </small>
               </div>
             </div>
           </div>
