@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { NotificationsLayout } from "../templates/NotificationsLayout";
 import { SideNav } from "../organisms/SideNav";
 import { IoIosSearch } from "react-icons/io";
+import { FaArrowLeft } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 import { fetchNotificationsIndex } from "../../apis/notifications";
 import { useNotificationsIndex } from "../../hooks/notifications";
 import { fetchingActionTypes } from "../../apis/base";
@@ -43,9 +45,12 @@ export const Notifications = () => {
   return (
     <NotificationsLayout
       header={
-        <nav className="h-full flex justify-between items-center backdrop-blur-sm">
+        <nav className="flex justify-between py-2 backdrop-blur-sm">
           <div className="flex justify-center items-center px-4">
-            <span className="mr-8 font-bold text-[20px]">通知</span>
+            <Link className="mr-8" to="/home">
+              <FaArrowLeft size={20} />
+            </Link>
+            <span className="font-bold text-[20px]">通知</span>
           </div>
         </nav>
       }
